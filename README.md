@@ -1,4 +1,4 @@
-# KARLX WORLD — Level 01
+# KARLX WORLD — Nivel 01
 
 Primer playground visual en HTML, CSS y JavaScript vanilla. Escena RPG 3/4,
 menú Y2K, personaje oficial y movimiento provisional. Sin dependencias,
@@ -10,10 +10,10 @@ backend ni portfolio completo. La configuración de Cloudflare se conserva.
 npx wrangler dev
 ```
 
-Abrir la URL indicada por Wrangler y pulsar **ENTER WORLD**. Mover con
+Abrir la URL indicada por Wrangler y pulsar **ENTRAR AL MUNDO**. Mover con
 **WASD** o **flechas**. El movimiento diagonal está normalizado, usa
 `requestAnimationFrame` y tiempo transcurrido. Hay límites y colisiones
-simples con edificios, bancos y troncos. **MENU** vuelve al inicio.
+simples con edificios, bancos y troncos. **MENÚ** vuelve al inicio.
 
 El personaje utiliza un recorte de la primera pose frontal del sprite sheet
 adjunto, sin rediseño ni frames inventados. Se mantiene la pose frontal

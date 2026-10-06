@@ -63,26 +63,26 @@ function building(x,y,w,h,type){
   poly([[x-10,y],[x+30,y-43],[x+w+40,y-43],[x+w+10,y]],palette[2]);
   line(x-10,y,x+w+10,y,'#f4eef6',4);line(x+30,y-43,x+w+40,y-43,'#68667f',3);
   rect(x+12,y+12,w-24,33,'#f4f0e8');
-  text(type==='studio'?'CREATIVE STUDIO':type==='lab'?'ECOMMERCE LAB':'SERVICE SHOP',x+w/2,y+34,type==='studio'?17:15);
+  text(type==='studio'?'ESTUDIO CREATIVO':type==='lab'?'LAB. COMERCIO ONLINE':'TIENDA DE SERVICIOS',x+w/2,y+34,type==='studio'?17:15);
   for(let i=0;i<4;i++){line(x+12,y+60+i*31,x+w-12,y+60+i*31,palette[1]);}
   if(type==='studio'){
     rect(x+18,y+61,190,112,'#6d7485');rect(x+23,y+66,180,102,'#adbfca');
     poly([[x+25,y+67],[x+117,y+67],[x+25,y+135]],'#dfe5de');
-    rect(x+35,y+89,48,60,'#f0bbce');text('MAKE',x+59,y+110,11);text('IT',x+59,y+126,13);text('REAL.',x+59,y+141,10);
+    rect(x+35,y+89,48,60,'#f0bbce');text('HAZ',x+59,y+110,11);text('LO',x+59,y+126,13);text('REAL.',x+59,y+141,10);
     rect(x+126,y+99,59,43,'#e8e0bf');poly([[x+144,y+106],[x+177,y+115],[x+153,y+133]],'#8f83ae');
     line(x+111,y+65,x+111,y+169,'#f8efe2',5);line(x+21,y+149,x+204,y+149,'#eee8dd',4);
     rect(x+226,y+61,70,130,'#777782');rect(x+232,y+67,58,121,'#9dacc0');rect(x+239,y+79,44,68,'#d7c6db');text('01',x+260,y+121,25,'#7d728e');rect(x+275,y+153,4,4,'#f9efbd');
   }else if(type==='lab'){
     rect(x+17,y+61,w-34,h-67,'#6e819f');rect(x+23,y+67,w-46,h-79,'#a9c8dd');
     for(let i=1;i<4;i++)line(x+18+i*(w-36)/4,y+62,x+18+i*(w-36)/4,y+h-6,'#e0e6f1',4);
-    rect(x+38,y+86,100,53,'#56627d');rect(x+43,y+91,90,42,'#bedbbc');text('hello, world',x+87,y+113,9,'#3f6767');
+    rect(x+38,y+86,100,53,'#56627d');rect(x+43,y+91,90,42,'#bedbbc');text('hola, mundo',x+87,y+113,9,'#3f6767');
     rect(x+168,y+93,54,48,'#dddce9');ellipse(x+195,y+117,18,18,'#929eb6');ellipse(x+195,y+117,5,5,'#dae5ed');
     line(x+26,y+70,x+107,y+h-16,'#f1f6fa88',9);
   }else{
     rect(x+15,y+66,145,103,'#766c87');rect(x+20,y+71,135,94,'#d5becf');
     line(x+66,y+104,x+57,y+151,'#534963',3);poly([[x+57,y+96],[x+75,y+96],[x+88,y+128],[x+48,y+128]],'#333348');
     rect(x+108,y+117,30,34,'#a989c3');line(x+114,y+117,x+114,y+109,'#706284',2);line(x+132,y+117,x+132,y+109,'#706284',2);
-    rect(x+180,y+66,60,119,'#8c7794');rect(x+185,y+72,50,72,'#e4cddd');text('OPEN',x+209,y+107,10);rect(x+226,y+151,4,4,'#f9efbd');
+    rect(x+180,y+66,60,119,'#8c7794');rect(x+185,y+72,50,72,'#e4cddd');text('ABIERTO',x+209,y+107,10);rect(x+226,y+151,4,4,'#f9efbd');
     for(let i=0;i<8;i++){poly([[x+10+i*30,y+54],[x+40+i*30,y+54],[x+46+i*30,y+85],[x+16+i*30,y+85]],i%2?'#f4e6de':'#b881a1');ellipse(x+31+i*30,y+85,15,6,i%2?'#f4e6de':'#b881a1');}
   }
   rect(x-6,y+h,w+17,8,'#9493a3');rect(x-14,y+h+8,w+28,7,'#b5b0b5');
@@ -90,7 +90,7 @@ function building(x,y,w,h,type){
 function tree(x,y,s,time){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ellipse(3,0,44,13,'#5b776c45');rect(-8,-65,16,67,'#897f75');rect(-3,-65,5,60,'#a39b85');const sway=reducedMotion?0:Math.sin(time*.00065+x)*1.5;ctx.translate(sway,0);ellipse(0,-82,42,47,'#688f87');ellipse(-21,-91,31,30,'#7ca397');ellipse(18,-104,31,33,'#92b0a0');ellipse(-5,-119,29,31,'#a1bb9d');for(let i=0;i<8;i++)rect((i*17)%60-30,-80-(i*23)%60,5,3,'#c3cfad');ctx.restore();}
 function bench(x,y){ellipse(x+75,y+15,88,14,'#6b737030');for(let i=0;i<3;i++)rect(x,y-28+i*9,150,6,'#b496a5');rect(x,y,150,12,'#ceafb9');for(let dx of [10,130]){rect(x+dx,y-30,5,50,'#696b7d');line(x+dx-7,y+20,x+dx+13,y+20,'#696b7d',3);}}
 function lamp(x,y,time){ellipse(x,y,18,7,'#526e7140');rect(x-3,y-110,6,110,'#666880');rect(x-10,y-3,20,6,'#666880');poly([[x-14,y-116],[x,y-127],[x+14,y-116]],'#707088');rect(x-10,y-115,20,24,'#e9dfa9');line(x,y-116,x,y-91,'#666880',2);if(!reducedMotion){ctx.globalAlpha=.1+.04*Math.sin(time*.002);ellipse(x,y-105,30,29,'#fff5bc');ctx.globalAlpha=1;}}
-function sign(x,y){rect(x-3,y-90,6,90,'#8d869a');rect(x-62,y-101,124,44,'#f5eddc');rect(x-65,y-105,130,4,'#9586ad');text('CREATIVE QUARTER',x,y-83,9);text('EST. 2000-ish',x,y-68,8,'#9d829a');}
+function sign(x,y){rect(x-3,y-90,6,90,'#8d869a');rect(x-62,y-101,124,44,'#f5eddc');rect(x-65,y-105,130,4,'#9586ad');text('BARRIO CREATIVO',x,y-83,9);text('FUND. ~2000',x,y-68,8,'#9d829a');}
 function planter(x,y){ellipse(x,y+4,24,8,'#62756e45');poly([[x-20,y-24],[x+20,y-24],[x+15,y+3],[x-15,y+3]],'#b49fac');ellipse(x,y-24,21,6,'#ddc3cc');for(let i=0;i<6;i++){line(x,y-24,x+(i-3)*6,y-48-(i%2)*13,'#647f76',3);ellipse(x+(i-3)*6,y-48-(i%2)*13,7,13,i%2?'#8caa91':'#aaba8c');}}
 function drawPlayer(){ellipse(player.x,player.y+3,23,8,'#3e45674a');const bounce=player.moving&&!reducedMotion?Math.sin(walkTime*17)*2:0;ctx.imageSmoothingEnabled=true;ctx.drawImage(sprite,player.x-character.width/2,player.y-character.height+bounce,character.width,character.height);}
 function blocked(x,y){if(x<42||x>1358||y<330||y>915)return true;return obstacles.some(o=>x+11>o.x&&x-11<o.x+o.w&&y+5>o.y&&y-5<o.y+o.h);}
@@ -107,7 +107,7 @@ window.addEventListener('blur',()=>keys.clear());
 document.addEventListener('visibilitychange',()=>{keys.clear();previous=0;});
 enter.addEventListener('click',()=>{if(!ready)return;active=true;keys.clear();start.classList.add('leaving');start.inert=true;hud.hidden=false;canvas.focus({preventScroll:true});gameEvents.dispatchEvent(new Event('enter'));});
 document.querySelector('#back').addEventListener('click',()=>{active=false;keys.clear();hud.hidden=true;start.inert=false;start.classList.remove('leaving');enter.focus();gameEvents.dispatchEvent(new Event('menu'));});
-sprite.onload=()=>{ready=true;enter.disabled=false;enter.textContent='ENTER WORLD';};
-sprite.onerror=()=>{const error=document.querySelector('#error');error.hidden=false;error.textContent='KARLX could not load. Please refresh to try again.';enter.textContent='ASSET UNAVAILABLE';};
+sprite.onload=()=>{ready=true;enter.disabled=false;enter.textContent='ENTRAR AL MUNDO';};
+sprite.onerror=()=>{const error=document.querySelector('#error');error.hidden=false;error.textContent='No se pudo cargar a KARLX. Recargá la página para volver a intentarlo.';enter.textContent='IMAGEN NO DISPONIBLE';};
 sprite.src=character.src;
 resize();requestAnimationFrame(frame);
