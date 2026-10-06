@@ -1,7 +1,5 @@
 const canvas = document.querySelector('#world');
 const ctx = canvas.getContext('2d');
-const enter = document.querySelector('#enter');
-const start = document.querySelector('#start');
 const hud = document.querySelector('#hud');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const WORLD = { width: 1400, height: 960 };
@@ -105,9 +103,19 @@ window.addEventListener('keydown',event=>{const key=event.key.toLowerCase();if(a
 window.addEventListener('keyup',event=>keys.delete(event.key.toLowerCase()));
 window.addEventListener('blur',()=>keys.clear());
 document.addEventListener('visibilitychange',()=>{keys.clear();previous=0;});
-enter.addEventListener('click',()=>{if(!ready)return;active=true;keys.clear();start.classList.add('leaving');start.inert=true;hud.hidden=false;canvas.focus({preventScroll:true});gameEvents.dispatchEvent(new Event('enter'));});
-document.querySelector('#back').addEventListener('click',()=>{active=false;keys.clear();hud.hidden=true;start.inert=false;start.classList.remove('leaving');enter.focus();gameEvents.dispatchEvent(new Event('menu'));});
-sprite.onload=()=>{ready=true;enter.disabled=false;enter.textContent='ENTRAR AL MUNDO';};
-sprite.onerror=()=>{const error=document.querySelector('#error');error.hidden=false;error.textContent='No se pudo cargar a KARLX. Recargá la página para volver a intentarlo.';enter.textContent='IMAGEN NO DISPONIBLE';};
+let resolveReady;
+let rejectReady;
+const assetsReady = new Promise((resolve, reject) => { resolveReady = resolve; rejectReady = reject; });
+sprite.onload=()=>{ready=true;resolveReady();};
+sprite.onerror=()=>{const error=document.querySelector('#error');error.hidden=false;error.textContent='No se pudo cargar a KARLX. Recargá la página para volver a intentarlo.';rejectReady(new Error('No se pudo cargar a KARLX.'));};
+export const game = {
+  ready: assetsReady,
+  events: gameEvents,
+  reveal() { hud.hidden=false; active=false; keys.clear(); },
+  resume() { if(!ready)return; active=true; keys.clear(); canvas.focus({preventScroll:true}); gameEvents.dispatchEvent(new Event('enter')); },
+  pause() { active=false; keys.clear(); },
+  menu() { active=false; keys.clear(); hud.hidden=true; gameEvents.dispatchEvent(new Event('menu')); },
+};
+document.querySelector('#back').addEventListener('click',()=>game.menu());
 sprite.src=character.src;
 resize();requestAnimationFrame(frame);

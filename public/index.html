@@ -6,26 +6,69 @@
   <meta name="theme-color" content="#b9cbe6">
   <title>KARLX WORLD — Nivel 01</title>
   <link rel="stylesheet" href="/css/styles.css">
-  <script type="module" src="/js/game.js"></script>
+  <link rel="stylesheet" href="/css/intro.css">
+  <script type="module" src="/js/intro.js"></script>
 </head>
 <body>
   <div class="desktop">
     <header class="system-bar"><span class="system-icon" aria-hidden="true">✦</span><strong>KARLX WORLD.exe</strong><span class="version">zona de prueba visual · v0.1</span><span class="window-tools" aria-hidden="true">_ □ ×</span></header>
     <main class="game-shell">
       <canvas id="world" aria-label="Zona de prueba de KARLX WORLD. Usá WASD o las flechas para moverte." tabindex="0"></canvas>
-      <section class="start-screen" id="start">
-        <div class="menu-orbit" aria-hidden="true"></div>
-        <div class="intro-label">TU PEQUEÑO RINCÓN DE INTERNET</div>
-        <h1><span>KARLX</span><span>WORLD</span></h1>
-        <p class="intro-copy">Una chica creativa. Un sueño digital.</p>
-        <button id="enter" disabled>CARGANDO MUNDO…</button>
-        <p class="menu-note">NIVEL 01 / EL BARRIO CREATIVO</p>
-        <div class="menu-star star-one" aria-hidden="true">✦</div><div class="menu-star star-two" aria-hidden="true">✧</div>
+      <section id="start" class="entry-overlay" aria-label="Entrada a KARLX WORLD">
+        <section id="boot" class="entry-screen boot-screen" aria-labelledby="boot-title">
+          <div class="boot-mark" aria-hidden="true">✦</div>
+          <h2 id="boot-title" class="chrome-title" tabindex="-1">KARLX WORLD</h2>
+          <p class="system-caption">INICIANDO KARLX WORLD...</p>
+          <progress id="boot-progress" max="100" value="10" aria-label="Carga de KARLX WORLD"></progress>
+          <p id="boot-message" class="boot-message" role="status">Cargando creatividad...</p>
+          <button id="retry" class="entry-button" hidden>REINTENTAR</button>
+          <span class="boot-footnote">ESTRATEGIA + CREATIVIDAD / SISTEMA PERSONAL</span>
+        </section>
+        <section id="welcome" class="entry-screen" hidden aria-labelledby="welcome-title">
+          <div class="entry-window">
+            <div class="entry-titlebar"><span>KARLX WORLD · BIENVENIDA</span><span aria-hidden="true">_ □ ×</span></div>
+            <div class="welcome-body">
+              <span class="entry-eyebrow">UN UNIVERSO PERSONAL / VOL. 01</span>
+              <h2 id="welcome-title" class="chrome-title" tabindex="-1">KARLX WORLD</h2>
+              <p class="editorial-copy">Estrategia, creatividad y un mundo de ideas por explorar.</p>
+              <button id="enter" class="entry-button primary">ENTRAR AL MUNDO</button>
+              <p class="quick-option">¿Tenés poco tiempo? <button id="quick" class="entry-link">→ VER PORTFOLIO RÁPIDO</button></p>
+              <span class="entry-stamp">CREADO PARA EXPLORAR A TU RITMO</span>
+            </div>
+          </div>
+        </section>
+        <section id="player-card" class="entry-screen" hidden aria-labelledby="player-title">
+          <div class="entry-window player-window">
+            <div class="entry-titlebar"><span>IDENTIFICACIÓN DE JUGADORA</span><span aria-hidden="true">□</span></div>
+            <div class="player-body">
+              <div class="player-portrait"><img src="/assets/characters/karlx/idle-front.png" alt="KARLX, el personaje principal" width="92" height="216"><span>KARLX / 01</span></div>
+              <div class="player-details"><span class="entry-eyebrow">ACCESO CONCEDIDO</span><h2 id="player-title" tabindex="-1">JUGADORA DETECTADA</h2>
+                <dl><div><dt>Nombre</dt><dd>KARLX</dd></div><div><dt>Clase</dt><dd>Marketing Digital &amp; Ecommerce</dd></div><div><dt>Experiencia</dt><dd>+5 años</dd></div><div><dt>Habilidad especial</dt><dd>Creativa + Analítica</dd></div></dl>
+                <h3>ÁREAS</h3><ul class="player-areas"><li>✦ Contenido</li><li>✦ Ecommerce</li><li>✦ Social Media</li><li>✦ Performance</li><li>✦ Dirección Creativa</li></ul>
+                <button id="launch" class="entry-button primary">INICIAR JUEGO</button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="connection" class="entry-screen boot-screen" hidden aria-labelledby="connection-title">
+          <h2 id="connection-title" class="chrome-title" tabindex="-1">KARLX WORLD</h2>
+          <ol id="connection-log" class="connection-log" aria-label="Secuencia de inicio"></ol>
+          <p id="connection-status" class="sr-only" role="status"></p>
+        </section>
       </section>
+      <div id="world-arrival" class="world-arrival" hidden role="status"><strong>KARLX WORLD</strong><span>La ciudad creativa de Karliannys Salazar</span></div>
+      <dialog id="phone-message" class="phone-message" aria-labelledby="phone-title">
+        <div class="phone-top"><span aria-hidden="true">● ● ●</span><span>KARLX WORLD</span></div>
+        <div class="phone-body"><small>01 / BANDEJA DE ENTRADA</small><h2 id="phone-title">NUEVO MENSAJE</h2><p>¡Hey! Soy Karlx ♡<br>Bienvenid@ a mi mundo.</p><p>Acá vas a encontrar algunos de mis proyectos, habilidades y servicios.</p><p>Podés explorar a tu ritmo o ir directo a lo que estás buscando.</p><div class="phone-actions"><button id="explore" class="entry-button primary">EXPLORAR</button><button id="map" class="entry-button">ABRIR MAPA</button></div></div>
+      </dialog>
+      <p id="movement-tip" class="movement-tip" hidden>WASD / ↑ ↓ ← → para moverte</p>
       <div class="hud" id="hud" hidden><div class="retro-panel location"><small>ESTÁS ACÁ</small><strong>Barrio Creativo</strong><span><i></i> NIVEL 01 · MODO EXPLORACIÓN</span></div><button class="back" id="back" aria-label="Volver a la pantalla de inicio">MENÚ</button><div class="retro-panel controls"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / FLECHAS PARA MOVERTE</span><small id="hint">Da una vuelta. Aún no hay nada que desbloquear.</small></div></div>
       <p id="error" role="alert" hidden></p>
     </main>
     <footer class="status-bar"><span>✦ KARLX / EN LÍNEA</span><span>SIN APURO. SOLO EXPLORÁ.</span><span>01: PRUEBA DEL MUNDO</span></footer>
   </div>
+  <aside class="audio-controls" aria-label="Preferencias de audio"><button id="music-toggle" aria-pressed="false" title="Activar música"><span aria-hidden="true">♫</span> MÚSICA <span class="audio-state">NO</span></button><button id="sound-toggle" aria-pressed="false" title="Activar sonidos"><span aria-hidden="true">◖))</span> SONIDOS <span class="audio-state">NO</span></button></aside>
+  <div id="entry-toast" class="entry-toast" role="status" hidden></div>
+  <noscript><p class="entry-noscript">Activá JavaScript en tu navegador para entrar a KARLX WORLD.</p></noscript>
 </body>
 </html>
