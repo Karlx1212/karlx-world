@@ -1,48 +1,43 @@
-# KARLX WORLD
+# KARLX WORLD — Level 01
 
-Página estática mínima para comprobar el hosting en Cloudflare Workers.
-Solo muestra **KARLX WORLD** y *Coming Soon*.
-
-## Estructura
-
-- `public/index.html`: página.
-- `public/styles.css`: estilos.
-- `wrangler.json`: configuración de Workers Static Assets.
-
-No necesita frameworks, dependencias de la aplicación ni compilación.
-No se agrega JavaScript porque la página no requiere interacción.
+Primer playground visual en HTML, CSS y JavaScript vanilla. Escena RPG 3/4,
+menú Y2K, personaje oficial y movimiento provisional. Sin dependencias,
+backend ni portfolio completo. La configuración de Cloudflare se conserva.
 
 ## Probar localmente
-
-Con Node.js LTS y npm instalados, desde la raíz del repositorio:
 
 ```sh
 npx wrangler dev
 ```
 
+Abrir la URL indicada por Wrangler y pulsar **ENTER WORLD**. Mover con
+**WASD** o **flechas**. El movimiento diagonal está normalizado, usa
+`requestAnimationFrame` y tiempo transcurrido. Hay límites y colisiones
+simples con edificios, bancos y troncos. **MENU** vuelve al inicio.
+
+El personaje utiliza un recorte de la primera pose frontal del sprite sheet
+adjunto, sin rediseño ni frames inventados. Se mantiene la pose frontal
+al caminar en todas las direcciones, con un desplazamiento vertical sutil.
+`character` en `public/js/game.js` define el asset y su tamaño para una
+futura integración de animaciones. `gameEvents` prepara eventos para sonido,
+sin incluir audio. Desktop primero; todavía no hay controles táctiles.
+
+## Archivos
+
+- `public/index.html`: menú, canvas e interfaz.
+- `public/css/styles.css`: interfaz retro y adaptación al viewport.
+- `public/js/game.js`: escenario, cámara, movimiento y dibujo por profundidad.
+- `public/assets/characters/karlx/idle-front.png`: pose oficial extraída.
+- `wrangler.json`: Workers Static Assets, sin cambios.
+
 ## Desplegar
-
-Si aún no hay una sesión autorizada de Cloudflare:
-
-```sh
-npx wrangler login
-```
-
-Después:
 
 ```sh
 npx wrangler deploy
 ```
 
-Wrangler publica directamente la carpeta `public` e indica la URL del sitio.
-No hace falta un script de Worker para servir estos archivos estáticos.
-
-## Cloudflare Workers conectado a GitHub
-
-- Repositorio: `karlx-world`.
-- Rama de producción: `main`.
-- Directorio raíz: raíz del repositorio.
-- Comando de compilación: vacío.
-- Comando de despliegue: `npx wrangler deploy`.
+En Cloudflare Workers conectado a GitHub: rama `main`, raíz del repositorio,
+compilación vacía y comando de despliegue `npx wrangler deploy`.
+La autenticación de Cloudflare es necesaria para desplegar desde CLI.
 
 Documentación: https://developers.cloudflare.com/workers/static-assets/

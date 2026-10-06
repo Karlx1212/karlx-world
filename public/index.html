@@ -1,15 +1,31 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>KARLX WORLD</title>
-    <link rel="stylesheet" href="/styles.css">
-  </head>
-  <body>
-    <main>
-      <h1>KARLX WORLD</h1>
-      <p><em>Coming Soon</em></p>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#b9cbe6">
+  <title>KARLX WORLD — Level 01</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script type="module" src="/js/game.js"></script>
+</head>
+<body>
+  <div class="desktop">
+    <header class="system-bar"><span class="system-icon" aria-hidden="true">✦</span><strong>KARLX WORLD.exe</strong><span class="version">visual playground · v0.1</span><span class="window-tools" aria-hidden="true">_ □ ×</span></header>
+    <main class="game-shell">
+      <canvas id="world" aria-label="Karlx World playground. Use WASD or arrow keys to move." tabindex="0"></canvas>
+      <section class="start-screen" id="start">
+        <div class="menu-orbit" aria-hidden="true"></div>
+        <div class="intro-label">YOUR LITTLE CORNER OF THE INTERNET</div>
+        <h1><span>KARLX</span><span>WORLD</span></h1>
+        <p class="intro-copy">A creative girl. A digital daydream.</p>
+        <button id="enter" disabled>LOADING WORLD…</button>
+        <p class="menu-note">LEVEL 01 / THE CREATIVE QUARTER</p>
+        <div class="menu-star star-one" aria-hidden="true">✦</div><div class="menu-star star-two" aria-hidden="true">✧</div>
+      </section>
+      <div class="hud" id="hud" hidden><div class="retro-panel location"><small>YOU ARE HERE</small><strong>Creative Quarter</strong><span><i></i> LEVEL 01 · EXPLORE MODE</span></div><button class="back" id="back" aria-label="Return to title screen">MENU</button><div class="retro-panel controls"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / ARROWS TO MOVE</span><small id="hint">Take a little walk. Nothing to unlock yet.</small></div></div>
+      <p id="error" role="alert" hidden></p>
     </main>
-  </body>
+    <footer class="status-bar"><span>✦ KARLX / ONLINE</span><span>NO RUSH. JUST EXPLORE.</span><span>01: WORLD TEST</span></footer>
+  </div>
+</body>
 </html>
