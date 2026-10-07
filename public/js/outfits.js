@@ -2,7 +2,7 @@
 // of clean transparent frames, shared cells, anchors and directional sequences.
 // Visible silhouette bounds measured from the supplied final avatars.
 // Used only for presentation; original PNGs are never resampled or rewritten.
-const bounds = [[100,75,760,1803],[103,75,757,1792],[102,70,763,1774],[102,77,760,1754]];
+const bounds = [[71,61,793,1798],[61,62,804,1792],[64,33,805,1798],[67,57,800,1712]];
 export const outfits = ['01', '02', '03', '04'].map((id, index) => ({
   id,
   idle: `/assets/characters/karlx/outfits/outfit-${id}-idle.png`,
