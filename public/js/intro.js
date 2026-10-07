@@ -16,8 +16,14 @@ const wait = milliseconds => new Promise(resolve => setTimeout(resolve, millisec
 let selectedOutfit = readOutfit();
 function renderOutfit() {
   const portrait = get('outfit-portrait');
-  portrait.src = selectedOutfit.idle;
-  portrait.alt = `KARLX, outfit ${selectedOutfit.id}`;
+  portrait.setAttribute('href', selectedOutfit.idle);
+  get('outfit-avatar').setAttribute('aria-label', `KARLX, outfit ${selectedOutfit.id}`);
+  const { width, height, bounds: [left, top, right, bottom] } = selectedOutfit.presentation;
+  const scale = 204 / (bottom - top);
+  portrait.setAttribute('width', width * scale);
+  portrait.setAttribute('height', height * scale);
+  portrait.setAttribute('x', 46 - (left + right) * scale / 2);
+  portrait.setAttribute('y', 6 - top * scale);
   get('outfit-label').textContent = `KARLX / ${selectedOutfit.id}`;
 }
 function changeOutfit(direction) {
