@@ -2,13 +2,14 @@
 // of clean transparent frames, shared cells, anchors and directional sequences.
 // Visible silhouette bounds measured from the supplied final avatars.
 // Used only for presentation; original PNGs are never resampled or rewritten.
-const bounds = [[71,61,793,1798],[61,62,804,1792],[64,33,805,1798],[67,57,800,1712]];
+const bounds = [[8,42,368,981],[8,42,371,980],[0,42,362,981],[0,42,360,971]];
+const widths = [368,371,362,408];
 export const outfits = ['01', '02', '03', '04'].map((id, index) => ({
   id,
   idle: `/assets/characters/karlx/outfits/outfit-${id}-idle.png`,
   spriteSheet: `/assets/characters/karlx/outfits/outfit-${id}-sprites.png`,
   animation: null,
-  presentation: { width: 864, height: 1821, bounds: bounds[index] },
+  presentation: { width: widths[index], height: 1024, bounds: bounds[index] },
 }));
 const storageKey = 'karlx-selected-outfit';
 export function readOutfit() {
