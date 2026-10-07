@@ -1,5 +1,6 @@
 import { game } from './game.js';
 import { audio } from './audio.js';
+import { outfits, readOutfit, saveOutfit } from './outfits.js';
 
 const get = id => document.getElementById(id);
 const overlay = get('start');
@@ -12,6 +13,22 @@ let generation = 0;
 let toastTimer;
 let tipTimer;
 const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+let selectedOutfit = readOutfit();
+function renderOutfit() {
+  const portrait = get('outfit-portrait');
+  portrait.src = selectedOutfit.idle;
+  portrait.alt = `KARLX, outfit ${selectedOutfit.id}`;
+  get('outfit-label').textContent = `KARLX / ${selectedOutfit.id}`;
+}
+function changeOutfit(direction) {
+  const index = outfits.indexOf(selectedOutfit);
+  selectedOutfit = outfits[(index + direction + outfits.length) % outfits.length];
+  saveOutfit(selectedOutfit);
+  renderOutfit();
+}
+get('outfit-previous').addEventListener('click', () => changeOutfit(-1));
+get('outfit-next').addEventListener('click', () => changeOutfit(1));
+renderOutfit();
 
 function screen(id, focusId) {
   phase = id;
