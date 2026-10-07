@@ -73,7 +73,7 @@ async function boot() {
     get('boot-message').textContent = 'Todo listo ✓';
     // A single painted frame, not an artificial loading delay.
     await new Promise(resolve => requestAnimationFrame(resolve));
-    screen('welcome', 'welcome-title');
+    screen('welcome');
   } catch {
     clearInterval(interval);
     get('boot-message').textContent = 'No se pudo cargar a KARLX. Recargá la página para volver a intentarlo.';
