@@ -8,6 +8,9 @@ const player = { x: 700, y: 580, speed: 210, moving: false, facing: 'down' };
 const character = { src: '/assets/characters/karlx/idle-front.png', width: 52, height: 122 };
 const sprite = new Image();
 const keys = new Set();
+const keyboardKeys = new Set();
+const touchKeys = new Set();
+let touchGesture = null;
 let active = false;
 let ready = false;
 let previous = 0;
@@ -99,10 +102,48 @@ function render(time){const dpr=canvas.width/view.width;ctx.setTransform(dpr,0,0
 }
 function frame(time){const dt=previous?Math.min((time-previous)/1000,.05):0;previous=time;update(dt);render(time);requestAnimationFrame(frame);}
 const movementKeys=['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'];
-window.addEventListener('keydown',event=>{const key=event.key.toLowerCase();if(active&&movementKeys.includes(key)){event.preventDefault();keys.add(key);}});
-window.addEventListener('keyup',event=>keys.delete(event.key.toLowerCase()));
-window.addEventListener('blur',()=>keys.clear());
-document.addEventListener('visibilitychange',()=>{keys.clear();previous=0;});
+// Both input sources feed the same direction set consumed by update().
+function syncDirections() {
+  keys.clear();
+  for (const key of keyboardKeys) keys.add(key);
+  for (const key of touchKeys) keys.add(key);
+}
+function endTouch() {
+  const id = touchGesture?.id;
+  touchGesture = null;
+  touchKeys.clear();
+  syncDirections();
+  if (id !== undefined && canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
+}
+function clearInput() {
+  keyboardKeys.clear();
+  endTouch();
+}
+window.addEventListener('keydown',event=>{const key=event.key.toLowerCase();if(active&&movementKeys.includes(key)){event.preventDefault();keyboardKeys.add(key);syncDirections();}});
+window.addEventListener('keyup',event=>{keyboardKeys.delete(event.key.toLowerCase());syncDirections();});
+window.addEventListener('blur',clearInput);
+document.addEventListener('visibilitychange',()=>{clearInput();previous=0;});
+canvas.addEventListener('pointerdown', event => {
+  if (!active || canvas.inert || touchGesture || !event.isPrimary || !['touch', 'pen'].includes(event.pointerType)) return;
+  touchGesture = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  canvas.setPointerCapture(event.pointerId);
+  event.preventDefault();
+});
+canvas.addEventListener('pointermove', event => {
+  if (!active || event.pointerId !== touchGesture?.id) return;
+  const dx = event.clientX - touchGesture.x;
+  const dy = event.clientY - touchGesture.y;
+  // A small dead zone avoids drift; directional thresholds allow diagonals.
+  const threshold = Math.max(10, Math.max(Math.abs(dx), Math.abs(dy)) * .35);
+  touchKeys.clear();
+  if (Math.abs(dx) > threshold) touchKeys.add(dx > 0 ? 'd' : 'a');
+  if (Math.abs(dy) > threshold) touchKeys.add(dy > 0 ? 's' : 'w');
+  syncDirections();
+  event.preventDefault();
+});
+for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+  canvas.addEventListener(type, event => { if (event.pointerId === touchGesture?.id) endTouch(); });
+}
 let resolveReady;
 let rejectReady;
 const assetsReady = new Promise((resolve, reject) => { resolveReady = resolve; rejectReady = reject; });
@@ -111,10 +152,10 @@ sprite.onerror=()=>{const error=document.querySelector('#error');error.hidden=fa
 export const game = {
   ready: assetsReady,
   events: gameEvents,
-  reveal() { hud.hidden=false; active=false; keys.clear(); },
-  resume() { if(!ready)return; active=true; keys.clear(); canvas.focus({preventScroll:true}); gameEvents.dispatchEvent(new Event('enter')); },
-  pause() { active=false; keys.clear(); },
-  menu() { active=false; keys.clear(); hud.hidden=true; gameEvents.dispatchEvent(new Event('menu')); },
+  reveal() { hud.hidden=false; active=false; clearInput(); canvas.style.touchAction='auto'; },
+  resume() { if(!ready)return; active=true; clearInput(); canvas.style.touchAction='none'; canvas.focus({preventScroll:true}); gameEvents.dispatchEvent(new Event('enter')); },
+  pause() { active=false; clearInput(); canvas.style.touchAction='auto'; },
+  menu() { active=false; clearInput(); canvas.style.touchAction='auto'; hud.hidden=true; gameEvents.dispatchEvent(new Event('menu')); },
 };
 document.querySelector('#back').addEventListener('click',()=>game.menu());
 sprite.src=character.src;
