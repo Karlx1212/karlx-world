@@ -33,3 +33,10 @@
   .welcome-body>.entry-eyebrow,.welcome-body>.editorial-copy,.welcome-body>#enter,.welcome-body>.quick-option{position:relative;top:var(--hero-offset)}
 }
 @media(prefers-reduced-motion:reduce){.entry-overlay,.world-arrival,.entry-button,.entry-overlay #enter{transition:none}.entry-overlay.is-leaving,.world-arrival.fading{opacity:0}.entry-button:hover,.entry-overlay #enter:hover{transform:none}}
+
+/* Match the primary input device, independently of viewport width. */
+.touch-movement-hint{display:none}
+@media(pointer:coarse) and (hover:none){
+  .keyboard-movement-hint{display:none}
+  .touch-movement-hint{display:inline}
+}
