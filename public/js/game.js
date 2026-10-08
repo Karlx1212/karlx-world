@@ -1,3 +1,4 @@
+import { worldMap } from './world-map.js';
 import { playerState } from './player-state.js';
 import { getFrontWalkPreview } from './front-walk-preview.js';
 import { getLeftWalk } from './left-walk.js';
@@ -12,8 +13,8 @@ const canvas = document.querySelector('#world');
 const ctx = canvas.getContext('2d');
 const hud = document.querySelector('#hud');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const WORLD = { width: 1400, height: 960 };
-const player = { x: 700, y: 580, speed: 210, moving: false, facing: 'down', get outfit() { return playerState.activeOutfit; } };
+const WORLD = worldMap.dimensions;
+const player = { ...worldMap.spawn, speed: 210, moving: false, facing: 'down', get outfit() { return playerState.activeOutfit; } };
 // Replace this manifest with professional directional frames later.
 const character = { src: '/assets/characters/karlx/idle-front.png', width: 52, height: 122 };
 const sprite = new Image();
@@ -28,15 +29,7 @@ let walkTime = 0;
 let view = { width: 1, height: 1, scale: 1, x: 0, y: 0 };
 // Future sound integration can subscribe without loading audio now.
 const gameEvents = new EventTarget();
-const obstacles = [
-  { x: 130, y: 245, w: 325, h: 195 },
-  { x: 580, y: 145, w: 275, h: 180 },
-  { x: 1010, y: 300, w: 260, h: 185 },
-  { x: 440, y: 650, w: 150, h: 35 },
-  { x: 870, y: 660, w: 150, h: 35 },
-];
-const trees = [[85,380,1.05],[490,280,.8],[920,285,.92],[1320,450,1.1],[160,720,1.15],[1200,765,1.15],[390,860,1.2],[1050,915,1.3]];
-for (const [x,y] of trees) obstacles.push({x:x-18,y:y-13,w:36,h:26});
+const obstacles = worldMap.obstacles;
 function resize() {
   const box = canvas.getBoundingClientRect();
   const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -52,18 +45,20 @@ function ellipse(x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellips
 function poly(points,color){ctx.fillStyle=color;ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fill();}
 function text(value,x,y,size,color='#43435f',font='monospace'){ctx.fillStyle=color;ctx.font=`${size}px ${font}`;ctx.textAlign='center';ctx.fillText(value,x,y);}
 function floor(time){
-  rect(0,0,1400,960,'#a5c2aa');
-  // A deterministic texture keeps the world stable between frames.
-  for(let i=0;i<430;i++){let x=(i*137)%1400,y=(i*79)%960;rect(x,y,3,2,i%3?'#96b69d':'#bdd0ad');}
-  poly([[35,460],[590,330],[1330,445],[1400,665],[710,780],[0,660]],'#8b9c92');
-  poly([[35,450],[590,320],[1330,435],[1400,650],[710,765],[0,645]],'#e5dfce');
-  poly([[650,285],[780,285],[880,960],[690,960]],'#e5dfce');
-  ctx.save();ctx.beginPath();[[35,450],[590,320],[1330,435],[1400,650],[710,765],[0,645]].forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();
-  for(let y=330;y<780;y+=32){line(0,y,1400,y,'#c9c4b9');for(let x=(y%64?0:30);x<1400;x+=64)line(x,y,x+8,y+32,'#c9c4b9');}ctx.restore();
-  ellipse(745,549,132,62,'#c4b8cc');ellipse(745,544,124,56,'#e5d9e4');ellipse(745,544,105,47,'#d8cedd');
-  text('K',745,559,45,'#eee9e8','Georgia');
-  for(const [x,y] of [[235,490],[1160,540],[570,745],[955,775]]){ellipse(x,y,28,11,'#829c8a');for(let i=0;i<7;i++){const fx=x+(i*11)%45-20,fy=y-(i%3)*7;line(fx,fy,fx,fy-12,'#6d926d',2);ellipse(fx,fy-12,4,3,i%2?'#f4b3c5':'#f3eab3');}}
-  for(let i=0;i<10;i++){const x=260+i*103,y=400+(i%3)*83;const alpha=reducedMotion?.45:.3+.3*Math.sin(time*.001+i);ctx.globalAlpha=Math.max(.05,alpha);sparkle(x,y,5);ctx.globalAlpha=1;}
+  const t=worldMap.terrain;
+  rect(0,0,WORLD.width,WORLD.height,t.color);
+  const texture=t.texture;
+  for(let i=0;i<texture.count;i++){let x=(i*texture.xStep)%WORLD.width,y=(i*texture.yStep)%WORLD.height;rect(x,y,texture.w,texture.h,texture.colors[i%3?1:0]);}
+  for(const path of t.paths)poly(path.points,path.color);
+  const paving=t.paving;
+  ctx.save();ctx.beginPath();t.paths[paving.pathIndex].points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();
+  for(let y=paving.startY;y<paving.endY;y+=paving.rowStep){line(0,y,WORLD.width,y,paving.color);for(let x=(y%paving.columnStep?0:paving.alternateX);x<WORLD.width;x+=paving.columnStep)line(x,y,x+paving.slant,y+paving.rowStep,paving.color);}ctx.restore();
+  for(const args of t.plaza)ellipse(...args);
+  const e=t.emblem;text(e.text,e.x,e.y,e.size,e.color,e.font);
+  const f=t.flowers;
+  for(const [x,y] of f.positions){ellipse(x,y,...f.bed);for(let i=0;i<f.count;i++){const fx=x+(i*f.xStep)%f.xRange-f.xOffset,fy=y-(i%f.yCycle)*f.yStep;line(fx,fy,fx,fy-f.stemHeight,f.stemColor,f.stemWidth);ellipse(fx,fy-f.stemHeight,f.petalWidth,f.petalHeight,f.colors[i%2]);}}
+  const a=t.sparkles;
+  for(let i=0;i<a.count;i++){const x=a.x+i*a.xStep,y=a.y+(i%a.yCycle)*a.yStep;const alpha=reducedMotion?.45:.3+.3*Math.sin(time*.001+i);ctx.globalAlpha=Math.max(.05,alpha);sparkle(x,y,a.size);ctx.globalAlpha=1;}
 }
 function sparkle(x,y,s){poly([[x,y-s],[x+2,y-2],[x+s,y],[x+2,y+2],[x,y+s],[x-2,y+2],[x-s,y],[x-2,y-2]],'#fff9e8');}
 function building(x,y,w,h,type){
@@ -126,11 +121,18 @@ function drawPlayer(){
   ctx.imageSmoothingEnabled=true;
   ctx.drawImage(sprite,player.x-character.width/2,player.y-character.height+bounce,character.width,character.height);
 }
-function blocked(x,y){if(x<42||x>1358||y<330||y>915)return true;return obstacles.some(o=>x+11>o.x&&x-11<o.x+o.w&&y+5>o.y&&y-5<o.y+o.h);}
+function blocked(x,y){const b=worldMap.walkableBounds;if(x<b.minX||x>b.maxX||y<b.minY||y>b.maxY)return true;return obstacles.some(o=>x+11>o.x&&x-11<o.x+o.w&&y+5>o.y&&y-5<o.y+o.h);}
 function update(dt){if(!active){player.moving=false;return;}let dx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'));let dy=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));const len=Math.hypot(dx,dy);const before={x:player.x,y:player.y};if(len){dx=dx/len*player.speed*dt;dy=dy/len*player.speed*dt;if(!blocked(player.x+dx,player.y))player.x+=dx;if(!blocked(player.x,player.y+dy))player.y+=dy;player.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');}player.moving=before.x!==player.x||before.y!==player.y;if(player.moving)walkTime+=dt;else walkTime=0;}
-function render(time){const dpr=canvas.width/view.width;ctx.setTransform(dpr,0,0,dpr,0,0);rect(0,0,view.width,view.height,'#a5c2aa');const visibleW=view.width/view.scale,visibleH=view.height/view.scale;view.x=Math.max(0,Math.min(WORLD.width-visibleW,player.x-visibleW/2));view.y=Math.max(0,Math.min(WORLD.height-visibleH,player.y-visibleH*.66));ctx.translate(-view.x*view.scale,-view.y*view.scale);ctx.scale(view.scale,view.scale);floor(time);
-  const objects=[{y:440,draw:()=>building(130,245,325,195,'studio')},{y:325,draw:()=>building(580,145,275,180,'lab')},{y:485,draw:()=>building(1010,300,260,185,'shop')},...trees.map(([x,y,s])=>({y,draw:()=>tree(x,y,s,time)})),...[[440,650],[870,660]].map(([x,y])=>({y:y+35,draw:()=>bench(x,y)})),...[[340,440],[990,450],[300,760],[1090,740]].map(([x,y])=>({y,draw:()=>lamp(x,y,time)})),{y:550,draw:()=>sign(1230,550)},...[[470,425],[955,393],[112,472],[1295,535],[625,830]].map(([x,y])=>({y,draw:()=>planter(x,y)}))];if(ready)objects.push({y:player.y,draw:drawPlayer});objects.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
-  ctx.setTransform(dpr,0,0,dpr,0,0);const shade=ctx.createLinearGradient(0,0,0,view.height);shade.addColorStop(0,'#7672a31a');shade.addColorStop(.7,'#ffffff00');shade.addColorStop(1,'#51496d26');ctx.fillStyle=shade;ctx.fillRect(0,0,view.width,view.height);
+function render(time){const dpr=canvas.width/view.width;ctx.setTransform(dpr,0,0,dpr,0,0);rect(0,0,view.width,view.height,worldMap.ambient.background);const visibleW=view.width/view.scale,visibleH=view.height/view.scale;view.x=Math.max(0,Math.min(WORLD.width-visibleW,player.x-visibleW/2));view.y=Math.max(0,Math.min(WORLD.height-visibleH,player.y-visibleH*.66));ctx.translate(-view.x*view.scale,-view.y*view.scale);ctx.scale(view.scale,view.scale);floor(time);
+  const objects=worldMap.objects.map(o=>({y:o.depth,draw:()=>{
+    if(o.kind==='building')building(o.x,o.y,o.w,o.h,o.type);
+    else if(o.kind==='tree')tree(o.x,o.y,o.scale,time);
+    else if(o.kind==='bench')bench(o.x,o.y);
+    else if(o.kind==='lamp')lamp(o.x,o.y,time);
+    else if(o.kind==='sign')sign(o.x,o.y);
+    else if(o.kind==='planter')planter(o.x,o.y);
+  }}));if(ready)objects.push({y:player.y,draw:drawPlayer});objects.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
+  ctx.setTransform(dpr,0,0,dpr,0,0);const shade=ctx.createLinearGradient(0,0,0,view.height);for(const [offset,color] of worldMap.ambient.shade)shade.addColorStop(offset,color);ctx.fillStyle=shade;ctx.fillRect(0,0,view.width,view.height);
 }
 function frame(time){const dt=previous?Math.min((time-previous)/1000,.05):0;previous=time;update(dt);render(time);requestAnimationFrame(frame);}
 const movementKeys=['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'];
