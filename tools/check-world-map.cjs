@@ -37,7 +37,7 @@ const server = http.createServer((req,res)=>{
       assert.equal(definition.id,'central-plaza');
       assert.deepEqual(definition.dimensions,{width:1400,height:960});
       assert.deepEqual(definition.spawn,{x:700,y:640});
-      assert.deepEqual(definition.bounds,{minX:42,maxX:1358,minY:330,maxY:915});
+      assert.deepEqual(definition.bounds,{minX:42,maxX:1358,minY:270,maxY:915});
       assert.equal(definition.obstacles.length,12);
       assert.equal(Math.min(...definition.obstacles.map(o=>o.y)),436);
       assert.equal(Math.max(...definition.obstacles.map(o=>o.y+o.h)),604);
@@ -45,13 +45,16 @@ const server = http.createServer((req,res)=>{
       assert.equal(Math.max(...definition.obstacles.map(o=>o.x+o.w)),837);
       assert.deepEqual(definition.objects,[{kind:'fountain',layer:'layered'}]);
       assert.deepEqual(definition.paths,[
-        {id:'north',points:[[640,330],[760,330],[760,460],[640,460]]},
+        {id:'north',points:[[640,270],[760,270],[760,460],[640,460]]},
         {id:'south',points:[[640,580],[760,580],[760,915],[640,915]]},
         {id:'west',points:[[42,500],[580,500],[580,620],[42,620]]},
         {id:'east',points:[[820,500],[1358,500],[1358,620],[820,620]]},
       ]);
-      assert.equal(definition.plaza.x,400);assert.equal(definition.plaza.y,350);assert.equal(definition.plaza.w,600);assert.equal(definition.plaza.h,450);
-      assert.deepEqual(definition.plaza.points,[[550,350],[850,350],[1000,470],[1000,680],[850,800],[550,800],[400,680],[400,470]]);
+      assert.equal(definition.plaza.x,400);assert.equal(definition.plaza.y,325);assert.equal(definition.plaza.w,600);assert.equal(definition.plaza.h,410);
+      assert.deepEqual(definition.plaza.points,[[550,325],[850,325],[1000,435],[1000,625],[850,735],[550,735],[400,625],[400,435]]);
+      const xs=definition.plaza.points.map(p=>p[0]),ys=definition.plaza.points.map(p=>p[1]);
+      assert.deepEqual([(Math.min(...xs)+Math.max(...xs))/2,(Math.min(...ys)+Math.max(...ys))/2],[700,530]);
+      assert.deepEqual([436-Math.min(...ys),Math.max(...ys)-604,563-Math.min(...xs),Math.max(...xs)-837],[111,131,163,163]);
       const result=await page.evaluate(async()=>{
         const t=window.__worldTest;const {selectOutfit}=await import('/js/player-state.js');const {game}=await import('/js/game.js');
         const verify=(ok,message)=>{if(!ok)throw Error(message);};
@@ -76,20 +79,20 @@ const server = http.createServer((req,res)=>{
           }
           reset();
           for(const point of [[540,640],[540,410],[860,410],[860,640],[700,640]])walk(...point);
-          for(const point of [[540,640],[540,410],[700,410],[700,330],[700,410],[860,410],[860,560],[1358,560],[860,560],[860,640],[700,640],[700,915],[700,640],[540,640],[540,560],[42,560],[540,560],[540,640],[700,640]])walk(...point);
+          for(const point of [[540,640],[540,410],[700,410],[700,270],[700,410],[860,410],[860,560],[1358,560],[860,560],[860,640],[700,640],[700,915],[700,640],[540,640],[540,560],[42,560],[540,560],[540,640],[700,640]])walk(...point);
         }
         // Basin from every side, followed by diagonal sliding along its south rim.
         for(const [x,y,key] of [[700,609,'w'],[700,431,'s'],[552,520,'d'],[848,520,'a']]){reset(x,y);step(key);verify(t.player.x===x&&t.player.y===y,'fountain collision');}
         reset(700,609);t.keys.add('w');t.keys.add('d');t.update(.05);verify(t.player.y===609&&t.player.x>700,'slide along fountain');
-        for(const [x,y,key] of [[42,640,'a'],[1358,640,'d'],[700,330,'w'],[700,915,'s']]){reset(x,y);step(key);verify(t.player.x===x&&t.player.y===y,'boundary');}
+        for(const [x,y,key] of [[42,640,'a'],[1358,640,'d'],[700,270,'w'],[700,915,'s']]){reset(x,y);step(key);verify(t.player.x===x&&t.player.y===y,'boundary');}
         reset();t.keys.add('s');t.keys.add('d');t.update(.05);verify(Math.abs(Math.hypot(t.player.x-700,t.player.y-640)-10.5)<1e-8,'diagonal speed');
         // Dense scan ensures removed objects have no remaining invisible collisions.
-        for(let y=330;y<=915;y+=5)for(let x=42;x<=1358;x+=5) {
+        for(let y=270;y<=915;y+=5)for(let x=42;x<=1358;x+=5) {
           const radius=((x-700)/137)**2+((y-520)/84)**2;
           if(radius<1)verify(t.blocked(x,y),'walkable inside platform at '+x+','+y);
           if(radius>1.6)verify(!t.blocked(x,y),'unexpected distant obstacle at '+x+','+y);
         }
-        for(const [x,y] of [[42,330],[700,640],[1358,915]]) {
+        for(const [x,y] of [[42,270],[700,640],[1358,915]]) {
           reset(x,y);t.render(1000);const v=t.view,w=v.width/v.scale,h=v.height/v.scale;
           if(matchMedia('(max-width: 600px), (pointer: coarse) and (max-width: 1000px)').matches) {
             verify(w<=1400+1e-8&&h<=960+1e-8,'mobile viewport stays inside world');

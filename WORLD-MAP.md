@@ -6,9 +6,9 @@ cámara, controles, outfits y las interfaces de entrada existentes.
 
 ## Distribución
 
-- Mundo: 1400 × 960. Límites transitables: X 42–1358, Y 330–915, sin cambios.
+- Mundo: 1400 × 960. Límites transitables: X 42–1358, Y 270–915.
 - Llegada: (700, 640), al sur de la fuente, sobre suelo transitable.
-- Plaza: X 400–1000, Y 350–800 (600 × 450).
+- Plaza: X 400–1000, Y 325–735 (600 × 410), centro (700, 530).
 - Fuente Mágica: centro lógico (700, 520), escala uniforme 0.58. Lienzo del
   recurso 576 × 400: ocupa 334.08 × 232 unidades; la plataforma tiene una
   huella proyectada de 274 × 168, aproximadamente 2.25 veces el alto del avatar
@@ -19,12 +19,12 @@ cámara, controles, outfits y las interfaces de entrada existentes.
   elíptica RX=137, RY=84, dentro de X 563–837 / Y 436–604. Impiden caminar
   sobre agua, escalones y pedestales, sin bloquear las cuatro salidas. Se
   conserva el motor original con huella de pies 22 × 10 y deslizamiento.
-- Norte: X 640–760, Y 330–460.
+- Norte: X 640–760, Y 270–460.
 - Sur: X 640–760, Y 580–915.
 - Oeste: X 42–580, Y 500–620.
 - Este: X 820–1358, Y 500–620.
-- Paseo continuo: elipse de 380 × 260 centrada en la fuente, conectada a los
-  cuatro caminos. El resto de la plaza también es transitable.
+- Paseo continuo sobre el pavimento octogonal, conectado a los cuatro caminos.
+  El resto de la plaza también es transitable.
 
 Se retiraron de la escena los tres edificios, ocho árboles, dos bancos, cuatro
 faroles, el cartel, cinco maceteros, flores, emblema, caminos y brillos antiguos.
@@ -158,9 +158,9 @@ visibilidad de la plataforma y el seguimiento de cámara original.
 ## Plaza octogonal definitiva — etapa 5
 
 La referencia aprobada es el boceto escritorio/móvil de la plaza octogonal.
-El pavimento rosa ocupa el polígono (550,350), (850,350), (1000,470),
-(1000,680), (850,800), (550,800), (400,680), (400,470), dentro del área
-600 × 450 anterior. Los cuatro caminos conservan sus coordenadas y ancho
+El pavimento rosa ocupa el polígono (550,325), (850,325), (1000,435),
+(1000,625), (850,735), (550,735), (400,625), (400,435), dentro del área
+600 × 410 aprobada en la opción C. Los cuatro caminos conservan su ancho
 de 120 unidades. Se retiró el paseo elíptico y el relleno rectangular:
 los caminos crema llegan al octágono sin atravesar visualmente su interior.
 
@@ -189,3 +189,23 @@ inalterados cámara, colisiones, fuente, outfits, intro y CSS. Las regresiones
 check-world-map y check-magical-fountain cubren circulación, cuatro outfits,
 entrada, controles táctiles, agua animada y movimiento reducido en Edge.
 Safari real no está disponible. Jardines y vegetación esperan aprobación visual.
+
+## Centrado equilibrado aprobado — opción C
+
+La geometría reproduce la vista previa C: centro (700,530), ancho 600,
+altura 410, márgenes de 111 unidades al norte, 131 al sur y 163 a cada
+lado respecto de la huella de la fuente (X 563–837, Y 436–604).
+Solo se prolonga el sendero norte hasta Y=270, manteniendo X 640–760
+y su extremo sur Y=460. Los otros tres senderos no cambian; el render
+existente de la unión evita bordes internos en los encuentros.
+
+El límite transitable norte pasa de 330 a 270 para permitir alcanzar
+el extremo del camino. Los otros límites siguen en X 42–1358 y Y máximo
+915, dentro del mundo 1400 × 960. No se añaden escenas ni interacciones.
+La fuente conserva (700,520), escala 0.58, todas sus bandas de colisión,
+profundidad y ciclo de 1920 ms. KARLX conserva la aparición (700,640).
+No se cambian materiales, recursos, cámara, motor ni controles.
+
+Las regresiones de mapa verifican los vértices, márgenes, recorridos completos
+hasta los cuatro extremos y el nuevo límite norte. Las pruebas de pavimento
+siguen verificando juntas, opacidad y encuentros con los materiales existentes.

@@ -19,7 +19,7 @@ export const worldMap = {
   id: 'central-plaza',
   dimensions: { width: 1400, height: 960 },
   spawn: { x: 700, y: 640 },
-  walkableBounds: { minX: 42, maxX: 1358, minY: 330, maxY: 915 },
+  walkableBounds: { minX: 42, maxX: 1358, minY: 270, maxY: 915 },
   obstacles: fountainObstacles,
   // The platform is ground; each raised piece has its own projected depth.
   objects: [fountain],
@@ -32,10 +32,10 @@ export const worldMap = {
       borderWidth: 16,
     },
     texture: { count: 430, xStep: 137, yStep: 79, w: 3, h: 2, colors: ['#bdd0ad', '#96b69d'] },
-    plaza: { x: 400, y: 350, w: 600, h: 450,
-      points: [[550,350],[850,350],[1000,470],[1000,680],[850,800],[550,800],[400,680],[400,470]] },
+    plaza: { x: 400, y: 325, w: 600, h: 410,
+      points: [[550,325],[850,325],[1000,435],[1000,625],[850,735],[550,735],[400,625],[400,435]] },
     paths: [
-      { id: 'north', points: [[640,330],[760,330],[760,460],[640,460]], color: '#eee5d9' },
+      { id: 'north', points: [[640,270],[760,270],[760,460],[640,460]], color: '#eee5d9' },
       { id: 'south', points: [[640,580],[760,580],[760,915],[640,915]], color: '#eee5d9' },
       { id: 'west', points: [[42,500],[580,500],[580,620],[42,620]], color: '#eee5d9' },
       { id: 'east', points: [[820,500],[1358,500],[1358,620],[820,620]], color: '#eee5d9' },

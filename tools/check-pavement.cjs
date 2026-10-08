@@ -6,7 +6,7 @@ const root=path.resolve(__dirname,'../public');
 const original=execFileSync('git',['show','952a5d5:public/js/game.js'],{encoding:'utf8'}).replaceAll('\r\n','\n');
 const current=fs.readFileSync(path.join(root,'js/game.js'),'utf8').replaceAll('\r\n','\n');
 for(const [start,end] of [['function resize()','new ResizeObserver'],['function blocked(','function render('],['function render(','function frame(']])assert.equal(current.slice(current.indexOf(start),current.indexOf(end)),original.slice(original.indexOf(start),original.indexOf(end)),'camera/movement/collisions changed');
-assert.equal(execFileSync('git',['diff','952a5d5','--name-only','--','public/assets/world/magical-fountain','public/js/magical-fountain.js','public/js/fountain-assets.js','public/css','public/js/intro.js','public/js/outfits.js','public/js/player-state.js','public/js/outfit-01-idle.js','public/js/outfit-02-animation.js','public/js/outfit-03-animation.js','public/js/outfit-04-animation.js'],{encoding:'utf8'}).trim(),'','protected resources changed');
+assert.equal(execFileSync('git',['diff','0656656','--name-only','--','public/assets/world/magical-fountain','public/assets/world/pavement','public/js/pavement.js','public/js/magical-fountain.js','public/js/fountain-assets.js','public/css','public/js/intro.js','public/js/outfits.js','public/js/player-state.js','public/js/outfit-01-idle.js','public/js/outfit-02-animation.js','public/js/outfit-03-animation.js','public/js/outfit-04-animation.js'],{encoding:'utf8'}).trim(),'','protected resources changed');
 const baseline=execFileSync('git',['show','952a5d5:public/js/world-map.js'],{encoding:'utf8'});
 const server=http.createServer((req,res)=>{
  if(req.url==='/js/__baseline-world.js'){res.setHeader('Content-Type','text/javascript');return res.end(baseline)}
@@ -22,8 +22,11 @@ const server=http.createServer((req,res)=>{
    const {worldMap:m}=await import('/js/world-map.js'),{worldMap:b}=await import('/js/__baseline-world.js');
    const current=JSON.parse(JSON.stringify(m)),previous=JSON.parse(JSON.stringify(b));
    for(const map of [current,previous])for(const key of ['pavement','plaza','promenade'])delete map.terrain[key];
+   // Only the approved north extension may differ from the original map.
+   previous.walkableBounds.minY=270;
+   previous.terrain.paths[0].points=[[640,270],[760,270],[760,460],[640,460]];
    if(JSON.stringify(current)!==JSON.stringify(previous))throw Error('protected map data changed');
-   const expected=[[550,350],[850,350],[1000,470],[1000,680],[850,800],[550,800],[400,680],[400,470]];
+   const expected=[[550,325],[850,325],[1000,435],[1000,625],[850,735],[550,735],[400,625],[400,435]];
    if(JSON.stringify(m.terrain.plaza.points)!==JSON.stringify(expected)||m.terrain.promenade)throw Error('octagonal geometry regression');
    const {drawPavement}=await import('/js/pavement.js');const tiles={};
    for(const name of ['plaza','paths','curb']){
@@ -53,7 +56,7 @@ const server=http.createServer((req,res)=>{
     const alpha=data[(y*1400+x)*4+3];if(alpha&&!inside(x+.5,y+.5)&&![[0,-1],[0,1],[-1,0],[1,0]].some(([dx,dy])=>inside(x+.5+dx,y+.5+dy)))throw Error('surface outside octagonal geometry');
     if([[0,0],[0,-2],[0,2],[-2,0],[2,0]].every(([dx,dy])=>inPlaza(x+.5+dx,y+.5+dy))&&alpha!==255)throw Error('plaza has hole '+x+','+y+' alpha '+alpha);
    }
-   for(const [x,y] of [[700,349],[700,420],[700,790],[700,810],[399,560],[401,560],[999,560],[1001,560]])for(let k=0;k<4;k++){
+   for(const [x,y] of [[700,324],[700,420],[700,725],[700,745],[399,560],[401,560],[999,560],[1001,560]])for(let k=0;k<4;k++){
     const tile=inPlaza(x,y)?tiles.plaza:tiles.paths;
     if(data[(y*1400+x)*4+k]!==tile.data[((y%tile.h)*tile.w+(x%tile.w))*4+k])throw Error('internal border at road/plaza junction');
    }

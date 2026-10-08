@@ -43,7 +43,7 @@ const server=http.createServer((req,res)=>{
      const verify=(ok,msg)=>{if(!ok)throw Error(msg)};
      for(const [time,expected] of [[0,0],[59,0],[60,1],[1919,31],[1920,0],[3840,0]])verify(fountainFrame(time,reduced)===(reduced?0:expected),'animation timing');
      const walk=(x,y)=>{for(const [axis,target,negative,positive] of [['x',x,'a','d'],['y',y,'w','s']]){let n=0;while(Math.abs(t.player[axis]-target)>1e-7){const delta=target-t.player[axis];t.clearInput();t.keys.add(delta<0?negative:positive);t.update(Math.min(.05,Math.abs(delta)/210));t.clearInput();verify(++n<400,'blocked route');verify(!t.blocked(t.player.x,t.player.y),'walking inside footprint')}}};
-     for(const p of [[540,640],[540,410],[860,410],[860,640],[700,640],[700,915],[700,640],[540,640],[540,560],[42,560],[540,560],[540,410],[700,410],[700,330],[700,410],[860,410],[860,560],[1358,560],[860,560],[860,640],[700,640]])walk(...p);
+     for(const p of [[540,640],[540,410],[860,410],[860,640],[700,640],[700,915],[700,640],[540,640],[540,560],[42,560],[540,560],[540,410],[700,410],[700,270],[700,410],[860,410],[860,560],[1358,560],[860,560],[860,640],[700,640]])walk(...p);
      // Every band edge blocks entry; standing within the ground ellipse is blocked.
      for(const o of worldMap.obstacles){const y=o.y+o.h/2;verify(t.blocked(o.x-10.9,y),'west band edge');verify(t.blocked(o.x+o.w+10.9,y),'east band edge')}
      for(let angle=0;angle<Math.PI*2;angle+=.05)verify(t.blocked(700+136*Math.cos(angle),520+83*Math.sin(angle)),'platform perimeter');
