@@ -87,7 +87,8 @@ async function load(reducedMotion = false) {
     restored.key('keyup', key); restored.tick();
     assert.equal(restored.game.playerAppearance.pose, 'idle');
   }
-  restored.select('outfit-04'); assert.equal(restored.game.playerAppearance.usesFallback, true);
+  restored.select('outfit-04'); assert.equal(restored.game.playerAppearance.usesFallback, false);
+  assert.equal(restored.game.playerAppearance.pose, 'idle');
   restored.select('outfit-03'); assert.equal(restored.game.playerAppearance.pose, 'idle');
   const reduced = await load(true); reduced.game.resume(); reduced.tick();
   for (const key of ['s','a','d','w']) {

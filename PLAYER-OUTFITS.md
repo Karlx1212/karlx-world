@@ -1,5 +1,44 @@
 # Identidad y animaciones de KARLX
 
+## Outfit 04 — integración funcional
+
+`outfit-04-animation.js` reutiliza el patrón de Outfits 02 y 03 sin modificar
+sus módulos ni sus hojas. Solo se activa para `outfit-04`, leído por el jugador
+desde `playerState.activeOutfit`. Cuatro hojas de 512 × 256 contienen cuatro
+frames por dirección, celdas de 128 × 256, duración 120 ms y anclaje (64, 250).
+El frame 1 de cada fila sirve de reposo direccional provisional y de pose fija
+con `prefers-reduced-motion`; detenerse conserva la orientación.
+`game.ready` espera y valida las dimensiones de las cuatro hojas.
+
+Fuente: `Hoja de sprites de chica caminando (1).png`, 1254 × 1254 RGBA,
+con 924058 píxeles totalmente transparentes. Se validaron las 16 figuras completas
+y su disposición frente/izquierda/derecha/espalda. Los residuos de color son
+casi invisibles sobre fondo opaco. `tools/prepare-outfit-04.py` separa los contactos
+entre filas siguiendo los huecos transparentes y el inicio del cabello en bandas
+acotadas bajo las zapatillas. No borra colores globalmente ni crea nuevas poses.
+Elimina pequeños fragmentos desconectados externos y residuos de filas vecinas
+por encima o debajo de la figura principal, conservando dos píxeles de margen
+para sus bordes suavizados. El PNG fuente permanece intacto.
+
+Las poses comparten la escala de preparación 118/226 y la escala de render
+122/(323 × 118/226): altura de referencia equivalente a 122 unidades del mundo,
+sin estirar figuras ni añadir rebote. Se conservan las pequeñas variaciones
+de las poses originales, con una línea de pies común y sin alterar la posición
+del jugador. No se modifican movimiento, velocidad, controles, cámara, colisiones,
+mapa, selector, persistencia ni pantallas de entrada.
+
+**Las caminatas laterales son provisionales:** sus poses no completan una
+alternancia natural de piernas y pueden parecer deslizantes. Están aceptadas
+para esta etapa; una futura actualización debe mejorar esas poses manteniendo
+el diseño e identidad del avatar.
+
+Pruebas: `node --experimental-vm-modules tools/check-outfit-04.cjs`, además de
+los harness de Outfits 02 y 03. Cubren las cuatro direcciones, reposo, ciclo,
+anclaje/escala del render, movimiento reducido, cambio de outfit, persistencia
+y regresiones de Outfits 01–03, usando los módulos reales con DOM/canvas simulado.
+Se inspeccionan también las hojas finales y se genera una vista previa animada
+a 120 ms. No sustituyen una prueba manual completa del playground en navegador.
+
 ## Outfit 03 — integración funcional
 
 `outfit-03-animation.js` sigue el patrón independiente de Outfit 02: cuatro

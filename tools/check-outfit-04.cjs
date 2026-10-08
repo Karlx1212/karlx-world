@@ -37,18 +37,18 @@ async function load(reducedMotion = false) {
   const m = await module(path.join(root, 'public/js/game.js')); await m.evaluate();
   await m.namespace.game.ready;
   return { game: m.namespace.game, select: cache.get(path.join(root, 'public/js/player-state.js')).namespace.selectOutfit,
-    pose: cache.get(path.join(root, 'public/js/outfit-02-animation.js')).namespace.getOutfit02Pose,
+    pose: cache.get(path.join(root, 'public/js/outfit-04-animation.js')).namespace.getOutfit04Pose,
     draws, tick: () => { clock += 50; raf(clock); }, key: (type, key) => callbacks[type]({ key, preventDefault() {} }) };
 }
 (async () => {
   const app = await load();
-  app.select('outfit-02'); app.game.resume(); app.tick(1000);
+  app.select('outfit-04'); app.game.resume(); app.tick(1000);
   let x = 700, y = 580;
   for (const [key, direction] of [['s','front'], ['a','left'], ['d','right'], ['w','back']]) {
     app.key('keydown', key); app.tick(1050);
     const walking = app.game.playerAppearance;
     assert.equal(walking.pose, 'walk'); assert.equal(walking.usesFallback, false);
-    assert.ok(walking.spriteSource.endsWith(`outfit-02-${direction}-walk.png`));
+    assert.ok(walking.spriteSource.endsWith(`outfit-04-${direction}-walk.png`));
     if (key === 's') y += 10.5;
     if (key === 'w') y -= 10.5;
     if (key === 'a') x -= 10.5;
@@ -62,15 +62,15 @@ async function load(reducedMotion = false) {
     assert.equal(app.game.playerAppearance.spriteSource, walking.spriteSource);
   }
   for (const facing of ['down','left','right','up']) {
-    const p = { outfit: 'outfit-02', moving: true, facing };
+    const p = { outfit: 'outfit-04', moving: true, facing };
     for (let n=0; n<8; n++) assert.equal(app.pose(p, (n*120+1)/1000, false).frame, n%4);
     assert.equal(app.pose(p, 0.5, true).isIdle, true);
     assert.equal(app.pose(p, 0.5, true).frame, 0);
     p.moving = false; assert.equal(app.pose(p, 1, false).isIdle, true);
     p.outfit = 'outfit-01'; assert.equal(app.pose(p, 1, false), null);
   }
-  assert.equal(storage.get('karlx-selected-outfit'), '02');
-  const restored = await load(); assert.equal(restored.game.playerOutfit, 'outfit-02');
+  assert.equal(storage.get('karlx-selected-outfit'), '04');
+  const restored = await load(); assert.equal(restored.game.playerOutfit, 'outfit-04');
   for (const [key, name] of [['s','front'], ['a','left'], ['d','right'], ['w','back']]) {
     restored.select('outfit-01'); restored.game.resume(); restored.tick(1000);
     restored.key('keydown', key); restored.tick(1050);
@@ -79,9 +79,25 @@ async function load(reducedMotion = false) {
     restored.key('keyup', key); restored.tick(1100);
     assert.equal(restored.game.playerAppearance.pose, 'idle');
   }
+  for (const [key, name] of [['s','front'], ['a','left'], ['d','right'], ['w','back']]) {
+    restored.select('outfit-02'); restored.game.resume(); restored.tick();
+    restored.key('keydown', key); restored.tick();
+    assert.equal(restored.game.playerAppearance.pose, 'walk');
+    assert.ok(restored.game.playerAppearance.spriteSource.endsWith(`outfit-02-${name}-walk.png`));
+    restored.key('keyup', key); restored.tick();
+    assert.equal(restored.game.playerAppearance.pose, 'idle');
+  }
+  for (const [key, name] of [['s','front'], ['a','left'], ['d','right'], ['w','back']]) {
+    restored.select('outfit-03'); restored.game.resume(); restored.tick();
+    restored.key('keydown', key); restored.tick();
+    assert.equal(restored.game.playerAppearance.pose, 'walk');
+    assert.ok(restored.game.playerAppearance.spriteSource.endsWith(`outfit-03-${name}-walk.png`));
+    restored.key('keyup', key); restored.tick();
+    assert.equal(restored.game.playerAppearance.pose, 'idle');
+  }
   restored.select('outfit-04'); assert.equal(restored.game.playerAppearance.usesFallback, false);
   assert.equal(restored.game.playerAppearance.pose, 'idle');
-  restored.select('outfit-02'); assert.equal(restored.game.playerAppearance.pose, 'idle');
+  restored.select('outfit-04'); assert.equal(restored.game.playerAppearance.pose, 'idle');
   const reduced = await load(true); reduced.game.resume(); reduced.tick();
   for (const key of ['s','a','d','w']) {
     reduced.key('keydown', key); reduced.tick();
@@ -89,5 +105,5 @@ async function load(reducedMotion = false) {
     assert.equal(reduced.draws.at(-1)[1], 0);
     reduced.key('keyup', key); reduced.tick();
   }
-  console.log('PASS: real game render, four directions and idle, 120ms sequence, reduced-motion poses, Outfit 01, switching, persistence, PNG loading.');
+  console.log('PASS: real game render, four directions and idle, 120ms sequence, reduced-motion poses, Outfits 01, 02 and 03, switching, persistence, PNG loading.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
