@@ -44,8 +44,9 @@ const server=http.createServer((req,res)=>{
      const verify=(ok,msg)=>{if(!ok)throw Error(msg);};
      const step=(key,dt)=>{t.clearInput();t.keys.add(key);t.update(dt);t.clearInput();t.render(1000);const v=t.view,w=v.width/v.scale,h=v.height/v.scale;verify(v.x===Math.max(0,Math.min(1400-w,t.player.x-w/2)),'horizontal follow');verify(v.y===Math.max(0,Math.min(960-h,t.player.y-h*.66)),'vertical follow');};
      for(const [key,inverse] of [['a','d'],['d','a'],['w','s'],['s','w']]){
-      for(let n=0;n<4;n++)step(key,.05);
-      for(let n=0;n<4;n++)step(inverse,.05);
+      // Stay south of the approved fountain's wider platform while testing return.
+      for(let n=0;n<2;n++)step(key,.05);
+      for(let n=0;n<2;n++)step(inverse,.05);
       verify(Math.abs(t.player.x-700)<1e-8&&Math.abs(t.player.y-640)<1e-8,'return to arrival');
       verify(Math.abs((700-t.view.x)*t.view.scale-t.view.width/2)<.5,'return stays centered');
      }

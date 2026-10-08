@@ -1,4 +1,5 @@
 import { worldMap } from './world-map.js';
+import { fountainReady, drawFountainGround, fountainDepthObjects } from './magical-fountain.js';
 import { playerState } from './player-state.js';
 import { getFrontWalkPreview } from './front-walk-preview.js';
 import { getLeftWalk } from './left-walk.js';
@@ -66,13 +67,10 @@ function floor(time){
   for(const path of t.paths)poly(path.points,path.color);
   const a=t.promenade;ellipse(a.x,a.y,a.rx,a.ry,a.color);
   for(const object of worldMap.objects.filter(o=>o.layer==='ground'))drawMapObject(object,time);
+  for(const object of worldMap.objects.filter(o=>o.kind==='fountain'))drawFountainGround(ctx,object,time,reducedMotion);
 }
 function drawMapObject(o,time){
-  if(o.kind==='fountain'){
-    ellipse(o.x,o.y,o.width/2,o.height/2,o.color);
-    ellipse(o.x,o.y,o.water.width/2,o.water.height/2,o.water.color);
-  }
-  else if(o.kind==='building')building(o.x,o.y,o.w,o.h,o.type);
+  if(o.kind==='building')building(o.x,o.y,o.w,o.h,o.type);
   else if(o.kind==='tree')tree(o.x,o.y,o.scale,time);
   else if(o.kind==='bench')bench(o.x,o.y);
   else if(o.kind==='lamp')lamp(o.x,o.y,time);
@@ -143,7 +141,7 @@ function drawPlayer(){
 function blocked(x,y){const b=worldMap.walkableBounds;if(x<b.minX||x>b.maxX||y<b.minY||y>b.maxY)return true;return obstacles.some(o=>x+11>o.x&&x-11<o.x+o.w&&y+5>o.y&&y-5<o.y+o.h);}
 function update(dt){if(!active){player.moving=false;return;}let dx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'));let dy=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));const len=Math.hypot(dx,dy);const before={x:player.x,y:player.y};if(len){dx=dx/len*player.speed*dt;dy=dy/len*player.speed*dt;if(!blocked(player.x+dx,player.y))player.x+=dx;if(!blocked(player.x,player.y+dy))player.y+=dy;player.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');}player.moving=before.x!==player.x||before.y!==player.y;if(player.moving)walkTime+=dt;else walkTime=0;}
 function render(time){const dpr=canvas.width/view.width;ctx.setTransform(dpr,0,0,dpr,0,0);rect(0,0,view.width,view.height,worldMap.ambient.background);const visibleW=view.width/view.scale,visibleH=view.height/view.scale;view.x=Math.max(0,Math.min(WORLD.width-visibleW,player.x-visibleW/2));view.y=Math.max(0,Math.min(WORLD.height-visibleH,player.y-visibleH*.66));ctx.translate(-view.x*view.scale,-view.y*view.scale);ctx.scale(view.scale,view.scale);floor(time);
-  const objects=worldMap.objects.filter(o=>o.layer!=='ground').map(o=>({y:o.depth,draw:()=>drawMapObject(o,time)}));if(ready)objects.push({y:player.y,draw:drawPlayer});objects.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
+  const objects=worldMap.objects.filter(o=>o.layer!=='ground').flatMap(o=>o.kind==='fountain'?fountainDepthObjects(ctx,o,time,reducedMotion):[{y:o.depth,draw:()=>drawMapObject(o,time)}]);if(ready)objects.push({y:player.y,draw:drawPlayer});objects.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
   ctx.setTransform(dpr,0,0,dpr,0,0);const shade=ctx.createLinearGradient(0,0,0,view.height);for(const [offset,color] of worldMap.ambient.shade)shade.addColorStop(offset,color);ctx.fillStyle=shade;ctx.fillRect(0,0,view.width,view.height);
 }
 function frame(time){const dt=previous?Math.min((time-previous)/1000,.05):0;previous=time;update(dt);render(time);requestAnimationFrame(frame);}
@@ -204,7 +202,7 @@ export const game = {
       spriteSource: preview?.manifest.src ?? (['outfit-01', 'outfit-02', 'outfit-03', 'outfit-04'].includes(player.outfit) ? null : character.src),
       usesFallback: !preview && !['outfit-01', 'outfit-02', 'outfit-03', 'outfit-04'].includes(player.outfit), pose: preview?.isIdle ? 'idle' : preview ? 'walk' : 'temporary' };
   },
-  ready: Promise.all([assetsReady, outfit01IdleReady, outfit02Ready, outfit03Ready, outfit04Ready]),
+  ready: Promise.all([assetsReady, outfit01IdleReady, outfit02Ready, outfit03Ready, outfit04Ready, fountainReady]),
   events: gameEvents,
   reveal() { hud.hidden=false; active=false; clearInput(); canvas.style.touchAction='auto'; },
   resume() { if(!ready)return; active=true; clearInput(); canvas.style.touchAction='none'; canvas.focus({preventScroll:true}); gameEvents.dispatchEvent(new Event('enter')); },

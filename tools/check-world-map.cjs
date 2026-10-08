@@ -38,8 +38,12 @@ const server = http.createServer((req,res)=>{
       assert.deepEqual(definition.dimensions,{width:1400,height:960});
       assert.deepEqual(definition.spawn,{x:700,y:640});
       assert.deepEqual(definition.bounds,{minX:42,maxX:1358,minY:330,maxY:915});
-      assert.deepEqual(definition.obstacles,[{x:580,y:460,w:240,h:120}]);
-      assert.deepEqual(definition.objects,[{kind:'fountain',layer:'ground'}]);
+      assert.equal(definition.obstacles.length,12);
+      assert.equal(Math.min(...definition.obstacles.map(o=>o.y)),436);
+      assert.equal(Math.max(...definition.obstacles.map(o=>o.y+o.h)),604);
+      assert.equal(Math.min(...definition.obstacles.map(o=>o.x)),563);
+      assert.equal(Math.max(...definition.obstacles.map(o=>o.x+o.w)),837);
+      assert.deepEqual(definition.objects,[{kind:'fountain',layer:'layered'}]);
       assert.deepEqual(definition.paths,[
         {id:'north',points:[[640,330],[760,330],[760,460],[640,460]]},
         {id:'south',points:[[640,580],[760,580],[760,915],[640,915]]},
@@ -74,14 +78,15 @@ const server = http.createServer((req,res)=>{
           for(const point of [[540,640],[540,410],[700,410],[700,330],[700,410],[860,410],[860,560],[1358,560],[860,560],[860,640],[700,640],[700,915],[700,640],[540,640],[540,560],[42,560],[540,560],[540,640],[700,640]])walk(...point);
         }
         // Basin from every side, followed by diagonal sliding along its south rim.
-        for(const [x,y,key] of [[700,585,'w'],[700,455,'s'],[569,520,'d'],[831,520,'a']]){reset(x,y);step(key);verify(t.player.x===x&&t.player.y===y,'fountain collision');}
-        reset(700,585);t.keys.add('w');t.keys.add('d');t.update(.05);verify(t.player.y===585&&t.player.x>700,'slide along fountain');
+        for(const [x,y,key] of [[700,609,'w'],[700,431,'s'],[552,520,'d'],[848,520,'a']]){reset(x,y);step(key);verify(t.player.x===x&&t.player.y===y,'fountain collision');}
+        reset(700,609);t.keys.add('w');t.keys.add('d');t.update(.05);verify(t.player.y===609&&t.player.x>700,'slide along fountain');
         for(const [x,y,key] of [[42,640,'a'],[1358,640,'d'],[700,330,'w'],[700,915,'s']]){reset(x,y);step(key);verify(t.player.x===x&&t.player.y===y,'boundary');}
         reset();t.keys.add('s');t.keys.add('d');t.update(.05);verify(Math.abs(Math.hypot(t.player.x-700,t.player.y-640)-10.5)<1e-8,'diagonal speed');
         // Dense scan ensures removed objects have no remaining invisible collisions.
         for(let y=330;y<=915;y+=5)for(let x=42;x<=1358;x+=5) {
-          const expected=x>569&&x<831&&y>455&&y<585;
-          verify(t.blocked(x,y)===expected,'unexpected obstacle at '+x+','+y);
+          const radius=((x-700)/137)**2+((y-520)/84)**2;
+          if(radius<1)verify(t.blocked(x,y),'walkable inside platform at '+x+','+y);
+          if(radius>1.6)verify(!t.blocked(x,y),'unexpected distant obstacle at '+x+','+y);
         }
         for(const [x,y] of [[42,330],[700,640],[1358,915]]) {
           reset(x,y);t.render(1000);const v=t.view,w=v.width/v.scale,h=v.height/v.scale;
@@ -138,7 +143,7 @@ const server = http.createServer((req,res)=>{
           });
           assert.deepEqual(framing.player,{x:700,y:640},'resize preserves world position');
           assert.ok(framing.width/framing.scale<=1400+1e-8 && framing.height/framing.scale<=960+1e-8,'no bands at mobile sizes');
-          const top=(460-framing.y)*framing.scale,bottom=(580-framing.y)*framing.scale;
+          const top=(436-framing.y)*framing.scale,bottom=(604-framing.y)*framing.scale;
           assert.ok(top>=0 && bottom<=framing.height,'whole fountain visible at arrival');
           assert.ok(122*framing.scale>=60,'readable avatar at mobile sizes');
           if(output) await page.screenshot({path:path.join(output,`plaza-${size.width}x${size.height}-${reduced?'reduced':'normal'}.png`)});

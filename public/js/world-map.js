@@ -1,18 +1,27 @@
-// Playable geometry only: provisional colors, no final art or interactions.
+import { fountainAssets } from './fountain-assets.js';
+// Paths/terrain remain provisional; the fountain uses the approved layered art.
 const fountain = {
-  kind: 'fountain', layer: 'ground', x: 700, y: 520, depth: 580,
-  width: 240, height: 120, color: '#d8b8c9',
-  water: { width: 190, height: 84, color: '#9bd7d8' },
+  kind: 'fountain', layer: 'layered', x: 700, y: 520,
+  scale: .58, assets: fountainAssets,
+  // Projected ground footprint of the broad platform, not the elevated crystal.
+  footprint: { rx: 137, ry: 84 },
 };
+// Conservative horizontal bands follow the platform without blocking corners
+// of its bounding rectangle. The existing foot-rectangle collision engine stays.
+const fountainObstacles = Array.from({ length: 12 }, (_, i) => {
+  const { rx, ry } = fountain.footprint, height = ry*2/12;
+  const top = -ry+i*height, bottom = top+height;
+  const nearest = Math.min(Math.abs(top), Math.abs(bottom));
+  const halfWidth = rx*Math.sqrt(1-(nearest/ry)**2);
+  return { x: fountain.x-halfWidth, y: fountain.y+top, w: halfWidth*2, h: height };
+});
 export const worldMap = {
   id: 'central-plaza',
   dimensions: { width: 1400, height: 960 },
   spawn: { x: 700, y: 640 },
   walkableBounds: { minX: 42, maxX: 1358, minY: 330, maxY: 915 },
-  // One conservative rectangle covers water and rim. No leftover obstacles.
-  obstacles: [{ x: fountain.x-fountain.width/2, y: fountain.y-fountain.height/2,
-    w: fountain.width, h: fountain.height }],
-  // Ground objects precede the character; future raised parts may use depth.
+  obstacles: fountainObstacles,
+  // The platform is ground; each raised piece has its own projected depth.
   objects: [fountain],
   terrain: {
     color: '#a5c2aa',

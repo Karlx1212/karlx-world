@@ -1,4 +1,4 @@
-# Plaza Central — geometría jugable provisional
+# Plaza Central — geometría jugable y Fuente Mágica
 
 `public/js/world-map.js` define la escena `central-plaza`, sin acceso al DOM ni
 al canvas. `game.js` conserva el motor de movimiento, colisiones rectangulares,
@@ -9,9 +9,16 @@ cámara, controles, outfits y las interfaces de entrada existentes.
 - Mundo: 1400 × 960. Límites transitables: X 42–1358, Y 330–915, sin cambios.
 - Llegada: (700, 640), al sur de la fuente, sobre suelo transitable.
 - Plaza: X 400–1000, Y 350–800 (600 × 450).
-- Fuente: elipse centrada en (700, 520), 240 × 120; interior 190 × 84.
-- Colisión única: X 580–820, Y 460–580. Cubre agua y borde; las esquinas del
-  rectángulo conservador también bloquean aunque queden fuera de la elipse.
+- Fuente Mágica: centro lógico (700, 520), escala uniforme 0.58. Lienzo del
+  recurso 576 × 400: ocupa 334.08 × 232 unidades; la plataforma tiene una
+  huella proyectada de 274 × 168, aproximadamente 2.25 veces el alto del avatar
+  en ancho. Los manifiestos de los outfits conservan sus escalas.
+- El centro del suelo corresponde al píxel (288,244); el anclaje frontal del
+  recurso (288,388) queda en (700,603.52). No se deforma la imagen a 240 × 120.
+- Colisión: doce bandas rectangulares conservadoras aproximan la plataforma
+  elíptica RX=137, RY=84, dentro de X 563–837 / Y 436–604. Impiden caminar
+  sobre agua, escalones y pedestales, sin bloquear las cuatro salidas. Se
+  conserva el motor original con huella de pies 22 × 10 y deslizamiento.
 - Norte: X 640–760, Y 330–460.
 - Sur: X 640–760, Y 580–915.
 - Oeste: X 42–580, Y 500–620.
@@ -27,18 +34,30 @@ disponibles en el motor; no hay estructuras nuevas ni conexiones de escena.
 ## Capas y alcance
 
 El terreno se dibuja primero: fondo, textura estática, plaza, caminos y paseo.
-La fuente utiliza `objects` con `layer: 'ground'`: base y agua planas se dibujan
-antes del avatar, sin taparlo cuando circula por los costados. Los objetos sin
-esa capa siguen usando el ordenado original por `depth`; una futura pieza
-elevada puede utilizarlo sin cambiar las animaciones o el anclaje del jugador.
+La fuente utiliza `objects` con `layer: 'layered'`. La base se dibuja primero,
+antes del avatar. Diez piezas elevadas (jardín posterior, dos pedestales
+posteriores, dos jardines laterales, estructura central, dos pedestales
+frontales y dos maceteros frontales) entran en el ordenado original por Y
+con profundidad propia según el pie proyectado de cada pieza. No se ordena
+toda la fuente por el borde inferior de la imagen. Los recortes son exclusivos:
+cada píxel aparece en una sola pieza, sin dobles alfas ni partes reconstruidas.
 
-Los colores son provisionales. No hay agua animada, partículas, reflejos nuevos,
-misiones, interacciones, tilesheets ni sprites nuevos. El degradado ambiental
-original permanece. Movimiento reducido conserva poses fijas de los outfits.
+El terreno y los caminos siguen siendo provisionales. La fuente usa únicamente
+los recursos aprobados de `fuente-magica-CAPAS-PARA-APROBACION.zip`, con la misma
+arquitectura estática en todos los frames y agua en máscaras autorizadas.
+`magical-fountain.js` selecciona uno de 32 frames a 60 ms a partir del timestamp
+del render existente: ciclo 1920 ms, sin intervalos ni temporizadores nuevos.
+Movimiento reducido fija el agua en el frame 0. El degradado ambiental permanece.
+`game.ready` espera la fuente; un fallo de carga usa el error del flujo existente.
+No hay interacciones, misiones ni decoración adicional.
 
-Pendiente de acabado: arte pixel RPG/Y2K, borde cromado, volumen de la fuente,
-jardines y vegetación. También queda evaluar el contorno rectangular conservador
-contra el contorno artístico final.
+Pendiente de acabado: jardines y caminos, después de aprobación visual.
+Los recursos están en `public/assets/world/magical-fountain/`: once PNG fijos
+y cinco atlas de agua, aproximadamente 1.3 MB comprimidos y 30.4 MB de píxeles
+decodificados. Los atlas usan cuatro columnas y ocho filas, todos menores de
+4096 px por lado. No se carga el GIF, WebP, máscaras ni composiciones de revisión.
+`fountain-assets.js` guarda recortes, profundidades y timing; se genera desde
+el ZIP con `tools/prepare-magical-fountain.py`, sin remuestreo ni repintado.
 
 ## Encuadre responsive
 
@@ -75,6 +94,8 @@ node --experimental-vm-modules tools/check-outfit-02.cjs
 node --experimental-vm-modules tools/check-outfit-03.cjs
 node --experimental-vm-modules tools/check-outfit-04.cjs
 node --experimental-vm-modules tools/check-initial-loading.cjs
+python tools/check-fountain-assets.py APPROVED_ZIP
+node tools/check-magical-fountain.cjs PLAYWRIGHT_MODULE EDGE_EXECUTABLE OUTPUT_DIRECTORY
 ```
 
 La prueba de mapa abre Edge en escritorio 1280 × 800 y móvil 390 × 844, con y
@@ -93,7 +114,7 @@ igualdad exacta de los PNG del canvas de escritorio antes y después.
 Las pruebas de entrada, tarjeta y retrato (`check-entry-browser`,
 `check-outfit-card`, `check-outfit-portrait`) completan las regresiones.
 La comparación pixel a pixel contra el escenario de la etapa 1 ya no aplica:
-la geometría cambia intencionalmente. Sus referencias anteriores siguen fuera
+la geometría y el arte cambian intencionalmente. Sus referencias anteriores siguen fuera
 del repositorio para revisión histórica.
 
 ## Regresión del encuadre inicial de escritorio
@@ -114,3 +135,21 @@ También prueba iPhone X 375 × 812, DPR 3, con insets sintéticos 44/34; compar
 los PNG puros del canvas antes/después para los cuatro outfits. Eso demuestra
 que este cambio de escritorio no altera el render móvil emulado, sin equivaler
 a una prueba de Safari real. Las capturas se guardan fuera del repositorio.
+
+## Validación de la fuente integrada
+
+`check-fountain-assets.py` reconstruye los recursos realmente empaquetados y
+los compara píxel por píxel con los 32 PNG del ZIP aprobado. Exige piezas sin
+solapamientos y arquitectura idéntica fuera de la máscara.
+`check-magical-fountain.cjs` abre Edge en 1920 × 900 y iPhone X 375 × 812,
+DPR 3 e insets sintéticos 44/34, con movimiento normal y reducido. Comprueba
+entrada completa, cuatro outfits, centro, arte completo visible al llegar,
+caminos transitables, contorno bloqueado, profundidades independientes y el
+orden real de dibujo al norte y al sur. Compara lecturas del canvas: cambian
+con agua animada y permanecen idénticas en movimiento reducido.
+Guarda capturas de llegada y de los cuatro lados; registra un ciclo de 32
+frames del render real en Edge para producir un GIF de demostración. No se
+inyectan hooks en producción. Safari real no está disponible en este entorno.
+El encuadre de cámara y el CSS responsive no se modificaron. Al girar un móvil
+a una pantalla muy baja se puede recortar el cristal superior, conservando la
+visibilidad de la plataforma y el seguimiento de cámara original.
