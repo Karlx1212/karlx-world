@@ -1,5 +1,37 @@
 # Identidad y animaciones de KARLX
 
+## Outfit 02 — primera versión funcional
+
+`outfit-02-animation.js` carga cuatro hojas de 512 × 256, con cuatro frames
+de 128 × 256 por dirección a 120 ms. Solo se activa para `outfit-02`.
+El frame 1 de cada dirección se utiliza como reposo provisional y también
+durante el desplazamiento con `prefers-reduced-motion`. La dirección se conserva
+al detenerse. Las hojas se validan y cargan antes de completar `game.ready`.
+
+Los 16 frames proceden de `Hoja de sprites de chica caminando.png` (1254 × 1254,
+RGBA). `tools/prepare-outfit-02.py` reproduce la extracción sin generar poses:
+separa las siluetas que cruzan las divisiones nominales mediante límites trazados,
+incluidos los contactos entre zapatillas y cabello de la fila siguiente. Descarta
+alfa 1–9 casi invisible y fragmentos desconectados de menos de 128 píxeles por
+encima o debajo de la silueta principal, sin filtrar colores. El original no se modifica.
+Una escala de preparación común 118/227 conserva las zancadas completas dentro
+de la celda. El render usa 122/(310 × 118/227), equivalente a una altura máxima
+de referencia de 122 unidades, y el anclaje fijo (64, 250). No se añade rebote.
+Las pequeñas diferencias de altura de las poses originales se conservan.
+
+**Las caminatas izquierda y derecha son provisionales:** no presentan una
+alternancia completa de piernas y pueden parecer deslizantes. Se aceptan para
+esta etapa funcional; una actualización visual deberá reemplazar las poses
+laterales por pasos intermedios y zancadas contrarias, manteniendo la identidad.
+No se modifican las hojas ni animaciones de Outfit 01, movimiento, controles,
+velocidad, cámara, colisiones, mapa ni selector/persistencia.
+
+Comprobación técnica: `node --experimental-vm-modules tools/check-outfit-02.cjs`.
+El harness ejecuta los módulos reales con un canvas simulado y lee las dimensiones
+de los PNG; verifica las cuatro direcciones, reposo, secuencia, movimiento reducido,
+Outfit 01, cambio de outfit y restauración de la selección. No sustituye una
+evaluación visual manual del playground en un navegador.
+
 `public/js/player-state.js` contiene el único estado de outfit. `playerState.activeOutfit`
 devuelve `outfit-01` a `outfit-04`; `playerState.outfit` devuelve su ficha del catálogo.
 Las flechas actualizan este estado y guardan la selección. La entrada al mundo no
