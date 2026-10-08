@@ -12,7 +12,7 @@ se utiliza 01 y el selector sigue funcionando.
 
 ## Apariencia jugable pendiente
 
-Reposo, arriba y otros outfits siguen usando `/assets/characters/karlx/idle-front.png`,
+Reposo y otros outfits siguen usando `/assets/characters/karlx/idle-front.png`,
 con las dimensiones actuales de 52 × 122. Hay una prueba reversible para Outfit 01
 caminando hacia abajo: `front-walk-preview.js` carga una hoja de 896 × 256 con siete
 celdas de 128 × 256, poses 1–6 y 8, a 100 ms por frame. No se usa la pose 7 recortada.
@@ -38,6 +38,12 @@ separaron siguiendo sus siluetas, sin cortar las botas en divisiones verticales.
 Las alturas originales son 758, 764, 761 y 762 px. La escala de preparación común
 204/764 permite conservar las zancadas anchas en celdas de 128 × 256. En canvas,
 122/204 mantiene la altura de referencia de 122 unidades y el anclaje (64, 250).
+
+La caminata de espaldas utiliza `back-walk.js` únicamente para Outfit 01 en
+dirección `up`: cuatro frames a 120 ms, hoja de 512 × 256 y celdas de 128 × 256.
+Las cuatro figuras originales están completas, con alturas 796, 797, 797 y 795 px.
+Una única escala 224/797 y el render 122/224 mantienen la altura de referencia,
+el centrado y el anclaje (64, 250). Las otras tres animaciones no se modifican.
 
 Cada entrada de `public/js/outfits.js` tiene `animation: null`, reservado para el
 manifiesto validado de animaciones. Para completar la etapa visual hacen falta
