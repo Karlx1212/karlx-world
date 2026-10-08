@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/fonts.css">
   <link rel="stylesheet" href="/css/intro.css">
+  <link rel="stylesheet" href="/css/phone.css">
   <script type="module" src="/js/intro.js"></script>
 </head>
 <body>
@@ -59,8 +60,28 @@
       </section>
       <div id="world-arrival" class="world-arrival" hidden role="status"><img class="arrival-logo" src="/assets/brand/karlx-world-logo-original.png" alt="KARLX WORLD" width="1280" height="1280"><span>La ciudad creativa de Karliannys Salazar</span></div>
       <dialog id="phone-message" class="phone-message" aria-labelledby="phone-title">
-        <div class="phone-top"><span aria-hidden="true">● ● ●</span><span>KARLX WORLD</span></div>
-        <div class="phone-body"><small>01 / BANDEJA DE ENTRADA</small><h2 id="phone-title">NUEVO MENSAJE</h2><p>¡Hey! Soy Karlx ♡<br>Bienvenid@ a mi mundo.</p><p>Acá vas a encontrar algunos de mis proyectos, habilidades y servicios.</p><p>Podés explorar a tu ritmo o ir directo a lo que estás buscando.</p><div class="phone-actions"><button id="explore" class="entry-button primary">EXPLORAR</button><button id="map" class="entry-button">ABRIR MAPA</button></div></div>
+        <div class="phone-hardware" aria-hidden="true"><span class="phone-speaker"></span><span class="phone-camera"></span></div>
+        <div class="phone-display">
+          <div class="phone-status" aria-hidden="true"><span>KARLX WORLD</span><span>▂▄▆ &nbsp; ▰</span></div>
+          <header class="chat-header">
+            <span class="chat-avatar" aria-hidden="true">♡</span>
+            <div class="chat-contact"><h2 id="phone-title" tabindex="-1">KARLX 💗</h2><span class="chat-online">En línea</span></div>
+            <span class="chat-tools" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3h4l2 5-3 2a15 15 0 0 0 6 6l2-3 5 2v4c0 2-2 3-4 2C9 19 5 15 3 7c-1-2 0-4 2-4Z"/></svg><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
+          </header>
+          <div class="phone-conversation">
+            <span class="chat-caption">NUEVO MENSAJE</span>
+            <div class="chat-messages" role="log" aria-label="Conversación con KARLX" aria-live="polite" aria-relevant="additions">
+              <p class="chat-bubble" hidden>¡Hey! Soy Karlx ♡</p>
+              <p class="chat-bubble" hidden>Bienvenid@ a mi mundo.</p>
+              <p class="chat-bubble" hidden>Acá vas a encontrar algunos de mis proyectos, habilidades y servicios.</p>
+              <p class="chat-bubble" hidden>Podés explorar a tu ritmo o ir directo a lo que estás buscando.</p>
+            </div>
+            <div id="chat-typing" class="chat-typing" role="status" aria-label="KARLX está escribiendo" hidden><span></span><span></span><span></span></div>
+            <div id="chat-actions" class="phone-actions" hidden><button id="explore" class="entry-button primary">EXPLORAR</button><button id="map" class="entry-button">ABRIR MAPA</button></div>
+          </div>
+          <div class="phone-screen-foot" aria-hidden="true">♡ &nbsp; CONEXIÓN CREATIVA</div>
+        </div>
+        <div class="phone-home" aria-hidden="true"></div>
       </dialog>
       <p id="movement-tip" class="movement-tip" hidden><span class="keyboard-movement-hint">WASD / ↑ ↓ ← → para moverte</span><span class="touch-movement-hint">DESLIZÁ PARA MOVERTE</span></p>
       <div class="hud" id="hud" hidden><div class="retro-panel location"><small>ESTÁS ACÁ</small><strong>Barrio Creativo</strong><span><i></i> NIVEL 01 · MODO EXPLORACIÓN</span></div><button class="back" id="back" aria-label="Volver a la pantalla de inicio">MENÚ</button><div class="retro-panel controls"><span class="keyboard-movement-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / FLECHAS PARA MOVERTE</span><small id="hint">Da una vuelta. Aún no hay nada que desbloquear.</small></div></div>

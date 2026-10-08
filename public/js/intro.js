@@ -12,6 +12,7 @@ let phase = 'boot';
 let generation = 0;
 let toastTimer;
 let tipTimer;
+let messageGeneration = 0;
 const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 let selectedOutfit = readOutfit();
 function renderOutfit() {
@@ -152,9 +153,28 @@ async function launch() {
 function showMessage() {
   phase = 'message';
   const phone = get('phone-message');
+  const bubbles = [...phone.querySelectorAll('.chat-bubble')];
+  bubbles.forEach(bubble => { bubble.hidden = true; });
+  get('chat-actions').hidden = true;
+  get('chat-typing').hidden = true;
   phone.showModal();
-  get('explore').focus();
+  get('phone-title').focus({ preventScroll: true });
   audio.play('notification');
+  revealMessages(bubbles);
+}
+async function revealMessages(bubbles) {
+  const run = ++messageGeneration;
+  for (const bubble of bubbles) {
+    if (!motion.matches) {
+      get('chat-typing').hidden = false;
+      await wait(320);
+    }
+    if (run !== messageGeneration || !get('phone-message').open) return;
+    get('chat-typing').hidden = true;
+    bubble.hidden = false;
+  }
+  get('chat-actions').hidden = false;
+  if (document.activeElement === get('phone-title')) get('explore').focus({ preventScroll: true });
 }
 function explore() {
   if (phase !== 'message') return;
@@ -177,6 +197,7 @@ get('map').addEventListener('click', () => {
   notify('El mapa de KARLX WORLD estará disponible muy pronto.');
 });
 get('phone-message').addEventListener('close', () => {
+  messageGeneration++;
   document.body.append(get('entry-toast'));
   get('entry-toast').hidden = true;
 });

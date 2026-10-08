@@ -1,0 +1,33 @@
+/* Welcome messenger only; the modal and its existing actions are retained. */
+.phone-message{box-sizing:border-box;inset:0;width:344px;max-width:calc(100vw - 32px);height:596px;max-height:calc(100svh - 32px);margin:auto;padding:12px;border:1px solid #8f96ad;border-radius:42px;background:linear-gradient(115deg,#fff 0%,#c7cbd7 9%,#f9fbff 18%,#e0dfea 45%,#c5d5e3 76%,#fff 90%,#aeb5c6);box-shadow:inset 0 0 0 2px #ffffffc7,inset -4px 0 5px #6f77984d,0 24px 65px #4e587b38;overflow:visible;display:flex;flex-direction:column;animation:phone-enter .3s ease-out}
+.phone-message:not([open]){display:none}
+.phone-message::before{width:3px;height:42px;position:absolute;left:-4px;top:108px;margin:0;background:linear-gradient(#fafbff,#a8b1c7);border:1px solid #8f96ad;border-radius:2px;box-shadow:none}
+.phone-message::after{content:'';position:absolute;right:-4px;top:126px;width:3px;height:30px;background:#cbd3e2;border:1px solid #8f96ad;border-radius:2px}
+.phone-message::backdrop{background:#e6e8f080;backdrop-filter:blur(4px)}
+.phone-hardware{height:25px;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:12px}
+.phone-speaker{width:48px;height:5px;border-radius:9px;background:#9299ac;box-shadow:inset 0 1px 2px #4c5269,0 1px #fff}
+.phone-camera{width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#b7d6f2,#424a61 60%);border:1px solid #8d96ad}
+.phone-display{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid #919ab2;border-radius:24px;background:#f7f6fb;box-shadow:0 1px 1px #fff,inset 0 0 0 1px #fff}
+.phone-status{display:flex;justify-content:space-between;padding:12px 16px 9px;font:400 7px Silkscreen,monospace;color:#68677d;background:#f0edf7}
+.chat-header{display:flex;align-items:center;gap:10px;padding:10px 14px 13px;border-bottom:1px solid #d4d3e2;background:linear-gradient(110deg,#fff,#ece6f6 70%,#e5f6ff)}
+.chat-avatar{display:grid;place-items:center;flex:0 0 37px;height:37px;border:1px solid #dca5ce;border-radius:50%;background:linear-gradient(145deg,#fff,#ffd5ef 50%,#c9ddff);box-shadow:inset 0 1px #fff;color:#a43181;font-size:25px}
+.chat-contact{flex:1;min-width:0}.chat-contact h2{margin:0 0 4px;font:700 15px/1.2 'Space Grotesk',sans-serif;letter-spacing:-.02em}.chat-contact h2:focus{outline:none}
+.chat-online{font-size:10px;color:#466354}.chat-online::before{content:'';display:inline-block;width:5px;height:5px;margin-right:5px;border-radius:50%;background:#84d99d}
+.chat-tools{display:flex;align-items:center;gap:14px;color:#66647d}.chat-tools svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.phone-conversation{flex:1;min-height:0;overflow:auto;padding:16px 14px 12px;background:radial-gradient(ellipse at 100% 0,#e0f3ff70,transparent 65%),#f7f6fb;scrollbar-width:thin;overscroll-behavior:contain}
+.chat-caption{display:block;margin:0 0 16px;text-align:center;font:400 7px Silkscreen,monospace;letter-spacing:.04em;color:#77758b}
+.chat-messages{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+.chat-bubble{max-width:94%;margin:0;padding:10px 12px;border:1px solid #d9d6e7;border-radius:12px 12px 12px 3px;background:#fff;box-shadow:0 2px 4px #8077960d;font:400 12px/1.5 Inter,sans-serif;animation:bubble-enter .22s ease-out}
+.chat-bubble:first-child{background:#f0eafa;border-color:#d7c7ed}
+.chat-typing{display:flex;align-items:center;gap:4px;width:43px;height:28px;margin-top:9px;padding:0 10px;border:1px solid #d9d6e7;border-radius:10px;background:#fff}
+.chat-typing span{width:4px;height:4px;border-radius:50%;background:#9b8daf;animation:typing-dot .7s ease-in-out infinite}.chat-typing span:nth-child(2){animation-delay:.12s}.chat-typing span:nth-child(3){animation-delay:.24s}
+.phone-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;animation:bubble-enter .22s ease-out}.phone-actions button{min-width:0;min-height:44px;padding:10px 5px;font-size:10px;border-radius:5px}.phone-actions #map{background:linear-gradient(#f5fdff,#c6ecff 48%,#aee0f6 50%,#e3f6ff);border-color:#92bdd8}
+.chat-bubble[hidden],.chat-typing[hidden],.phone-actions[hidden]{display:none}
+.phone-screen-foot{padding:8px;text-align:center;border-top:1px solid #e0dce9;font:400 6px Silkscreen,monospace;color:#9290a4;background:#f0edf7}
+.phone-home{flex-shrink:0;align-self:center;width:36px;height:12px;margin-top:9px;border:1px solid #a6acc0;border-radius:8px;background:linear-gradient(#fff,#c9cedd);box-shadow:inset 0 1px #fff}
+.phone-message .entry-toast{position:absolute;left:18px;right:18px;bottom:32px;width:auto;max-width:none;transform:none;font-size:11px}
+@keyframes phone-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bubble-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes typing-dot{50%{opacity:.4;transform:translateY(-2px)}}
+@media(max-height:620px){.phone-message{padding:9px;border-radius:32px}.phone-hardware{height:18px}.phone-status{padding-top:7px;padding-bottom:6px}.chat-header{padding-top:7px;padding-bottom:8px}.phone-conversation{padding-top:10px;padding-bottom:8px}.chat-caption{margin-bottom:10px}.chat-messages{gap:6px}.chat-bubble{padding:7px 10px;font-size:11px}.phone-actions{margin-top:10px}.phone-home{height:9px;margin-top:6px}}
+@media(prefers-reduced-motion:reduce){.phone-message,.chat-bubble,.phone-actions,.chat-typing span{animation:none}}
