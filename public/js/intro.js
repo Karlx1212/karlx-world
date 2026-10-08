@@ -29,6 +29,9 @@ function renderOutfit() {
   portrait.style.setProperty('--avatar-left', `${(46 - (left + right) * scale / 2) / 92 * 100}%`);
   portrait.style.setProperty('--avatar-top', `${(6 - top * scale) / 216 * 100}%`);
   get('outfit-label').textContent = `KARLX / ${selectedOutfit.id}`;
+  get('outfit-class').textContent = selectedOutfit.className;
+  get('outfit-ability').textContent = selectedOutfit.ability;
+  get('outfit-description').textContent = selectedOutfit.description;
 }
 function changeOutfit(direction) {
   const index = outfits.indexOf(playerState.outfit);
