@@ -1,5 +1,44 @@
 # Identidad y animaciones de KARLX
 
+## Outfit 03 — integración funcional
+
+`outfit-03-animation.js` sigue el patrón independiente de Outfit 02: cuatro
+hojas de 512 × 256 con cuatro celdas de 128 × 256, a 120 ms por frame,
+anclaje (64, 250), y activación exclusiva para `outfit-03` desde el estado
+compartido del jugador. El frame 1 de cada dirección sirve de reposo provisional
+y de pose fija durante el movimiento reducido. La orientación no se reinicia.
+`game.ready` valida y espera la carga de las cuatro hojas.
+
+La fuente es `Spritesheet de caminata gótica en 16 poses.png`, 1254 × 1254 RGBA,
+con 961365 píxeles totalmente transparentes. Las 16 figuras están completas.
+Los residuos de color son prácticamente invisibles al componer sobre fondo opaco;
+no se aplica un borrado global por tonalidad. Las filas se tocan en varios puntos.
+`tools/prepare-outfit-03.py` traza separaciones locales en bandas acotadas entre
+filas mediante transparencia y el borde de inicio del cabello bajo las botas,
+sin cambiar colores dentro del avatar. Elimina únicamente fragmentos pequeños
+desconectados fuera de los límites verticales de la figura principal.
+
+Una escala común de preparación 118/237 deja márgenes laterales y conserva las
+proporciones de los originales. El render 122/(324 × 118/237) mantiene la altura
+de referencia de 122 unidades, con pequeñas variaciones originales entre poses.
+Se conserva un margen de dos píxeles de origen para los bordes suavizados.
+No se añade oscilación al render ni se generan nuevas poses.
+
+**Las caminatas laterales son provisionales**, aceptadas para esta etapa:
+las piernas no completan una alternancia y pueden dar sensación de deslizamiento.
+Una futura actualización visual debe mejorar las poses sin cambiar el avatar.
+Los recursos y módulos de animación de Outfits 01 y 02 permanecen intactos.
+El selector, persistencia, movimiento, velocidad, controles, cámara, colisiones,
+mapa y pantallas de entrada no se modifican.
+
+Validación: `node --experimental-vm-modules tools/check-outfit-03.cjs` y
+`node --experimental-vm-modules tools/check-outfit-02.cjs`. Los harness ejecutan
+los módulos reales con DOM/canvas simulados y dimensiones reales de los PNG:
+caminata/reposo en cuatro direcciones, ciclo de 120 ms, anclaje/escala del render,
+movimiento reducido, selección persistente y regresiones de Outfits 01 y 02.
+La inspección de las hojas derivadas complementa esas pruebas; no equivalen
+a una prueba manual completa del playground en navegador.
+
 ## Outfit 02 — primera versión funcional
 
 `outfit-02-animation.js` carga cuatro hojas de 512 × 256, con cuatro frames
