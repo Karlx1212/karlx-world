@@ -57,6 +57,13 @@
 .outfit-card-details .outfit-class{margin:0 0 16px;font:700 17px/1.2 'Space Grotesk',Arial,sans-serif;letter-spacing:-.025em;color:#625080;overflow-wrap:break-word}
 .player-portrait .outfit-ability{margin:0;font:600 10px/1.5 Inter,Arial,sans-serif;color:#714578;letter-spacing:.03em}
 .outfit-card-details .outfit-description{margin:14px 0 0;padding:0;border:0;background:none;font:400 12px/1.65 Inter,Arial,sans-serif;color:#505066;overflow-wrap:break-word}
+.player-details{display:flex;flex-direction:column;justify-content:space-between;gap:24px;min-width:0}
+.player-profile{padding:16px 18px;border:1px solid #d0cde1;border-radius:4px;background:linear-gradient(120deg,#f4effa80,#edf6fc60)}
+.player-details .player-profile h3{margin:0 0 10px;color:#625080}
+.player-profile p{margin:0 0 16px;font-size:14px;line-height:1.6;color:#505066}
+.player-profile .player-areas{margin:0}
+.player-action p{margin:0 0 10px;font-size:12px;line-height:1.5;color:#656577}
+@media(max-width:480px){.player-details{gap:22px}.player-profile{padding:14px}.player-action .entry-button{width:100%}}
 @media(max-width:480px){
   .player-body{grid-template-columns:minmax(0,1fr)}
   .player-portrait{width:100%;padding:12px 16px;min-height:200px}
