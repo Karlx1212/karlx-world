@@ -49,16 +49,22 @@ function floor(time){
   rect(0,0,WORLD.width,WORLD.height,t.color);
   const texture=t.texture;
   for(let i=0;i<texture.count;i++){let x=(i*texture.xStep)%WORLD.width,y=(i*texture.yStep)%WORLD.height;rect(x,y,texture.w,texture.h,texture.colors[i%3?1:0]);}
+  const p=t.plaza;rect(p.x,p.y,p.w,p.h,p.color);
   for(const path of t.paths)poly(path.points,path.color);
-  const paving=t.paving;
-  ctx.save();ctx.beginPath();t.paths[paving.pathIndex].points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();
-  for(let y=paving.startY;y<paving.endY;y+=paving.rowStep){line(0,y,WORLD.width,y,paving.color);for(let x=(y%paving.columnStep?0:paving.alternateX);x<WORLD.width;x+=paving.columnStep)line(x,y,x+paving.slant,y+paving.rowStep,paving.color);}ctx.restore();
-  for(const args of t.plaza)ellipse(...args);
-  const e=t.emblem;text(e.text,e.x,e.y,e.size,e.color,e.font);
-  const f=t.flowers;
-  for(const [x,y] of f.positions){ellipse(x,y,...f.bed);for(let i=0;i<f.count;i++){const fx=x+(i*f.xStep)%f.xRange-f.xOffset,fy=y-(i%f.yCycle)*f.yStep;line(fx,fy,fx,fy-f.stemHeight,f.stemColor,f.stemWidth);ellipse(fx,fy-f.stemHeight,f.petalWidth,f.petalHeight,f.colors[i%2]);}}
-  const a=t.sparkles;
-  for(let i=0;i<a.count;i++){const x=a.x+i*a.xStep,y=a.y+(i%a.yCycle)*a.yStep;const alpha=reducedMotion?.45:.3+.3*Math.sin(time*.001+i);ctx.globalAlpha=Math.max(.05,alpha);sparkle(x,y,a.size);ctx.globalAlpha=1;}
+  const a=t.promenade;ellipse(a.x,a.y,a.rx,a.ry,a.color);
+  for(const object of worldMap.objects.filter(o=>o.layer==='ground'))drawMapObject(object,time);
+}
+function drawMapObject(o,time){
+  if(o.kind==='fountain'){
+    ellipse(o.x,o.y,o.width/2,o.height/2,o.color);
+    ellipse(o.x,o.y,o.water.width/2,o.water.height/2,o.water.color);
+  }
+  else if(o.kind==='building')building(o.x,o.y,o.w,o.h,o.type);
+  else if(o.kind==='tree')tree(o.x,o.y,o.scale,time);
+  else if(o.kind==='bench')bench(o.x,o.y);
+  else if(o.kind==='lamp')lamp(o.x,o.y,time);
+  else if(o.kind==='sign')sign(o.x,o.y);
+  else if(o.kind==='planter')planter(o.x,o.y);
 }
 function sparkle(x,y,s){poly([[x,y-s],[x+2,y-2],[x+s,y],[x+2,y+2],[x,y+s],[x-2,y+2],[x-s,y],[x-2,y-2]],'#fff9e8');}
 function building(x,y,w,h,type){
@@ -124,14 +130,7 @@ function drawPlayer(){
 function blocked(x,y){const b=worldMap.walkableBounds;if(x<b.minX||x>b.maxX||y<b.minY||y>b.maxY)return true;return obstacles.some(o=>x+11>o.x&&x-11<o.x+o.w&&y+5>o.y&&y-5<o.y+o.h);}
 function update(dt){if(!active){player.moving=false;return;}let dx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'));let dy=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));const len=Math.hypot(dx,dy);const before={x:player.x,y:player.y};if(len){dx=dx/len*player.speed*dt;dy=dy/len*player.speed*dt;if(!blocked(player.x+dx,player.y))player.x+=dx;if(!blocked(player.x,player.y+dy))player.y+=dy;player.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');}player.moving=before.x!==player.x||before.y!==player.y;if(player.moving)walkTime+=dt;else walkTime=0;}
 function render(time){const dpr=canvas.width/view.width;ctx.setTransform(dpr,0,0,dpr,0,0);rect(0,0,view.width,view.height,worldMap.ambient.background);const visibleW=view.width/view.scale,visibleH=view.height/view.scale;view.x=Math.max(0,Math.min(WORLD.width-visibleW,player.x-visibleW/2));view.y=Math.max(0,Math.min(WORLD.height-visibleH,player.y-visibleH*.66));ctx.translate(-view.x*view.scale,-view.y*view.scale);ctx.scale(view.scale,view.scale);floor(time);
-  const objects=worldMap.objects.map(o=>({y:o.depth,draw:()=>{
-    if(o.kind==='building')building(o.x,o.y,o.w,o.h,o.type);
-    else if(o.kind==='tree')tree(o.x,o.y,o.scale,time);
-    else if(o.kind==='bench')bench(o.x,o.y);
-    else if(o.kind==='lamp')lamp(o.x,o.y,time);
-    else if(o.kind==='sign')sign(o.x,o.y);
-    else if(o.kind==='planter')planter(o.x,o.y);
-  }}));if(ready)objects.push({y:player.y,draw:drawPlayer});objects.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
+  const objects=worldMap.objects.filter(o=>o.layer!=='ground').map(o=>({y:o.depth,draw:()=>drawMapObject(o,time)}));if(ready)objects.push({y:player.y,draw:drawPlayer});objects.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
   ctx.setTransform(dpr,0,0,dpr,0,0);const shade=ctx.createLinearGradient(0,0,0,view.height);for(const [offset,color] of worldMap.ambient.shade)shade.addColorStop(offset,color);ctx.fillStyle=shade;ctx.fillRect(0,0,view.width,view.height);
 }
 function frame(time){const dt=previous?Math.min((time-previous)/1000,.05):0;previous=time;update(dt);render(time);requestAnimationFrame(frame);}

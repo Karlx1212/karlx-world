@@ -43,7 +43,7 @@ async function load(reducedMotion = false) {
 (async () => {
   const app = await load();
   app.select('outfit-04'); app.game.resume(); app.tick(1000);
-  let x = 700, y = 580;
+  let x = 700, y = 640;
   for (const [key, direction] of [['s','front'], ['a','left'], ['d','right'], ['w','back']]) {
     app.key('keydown', key); app.tick(1050);
     const walking = app.game.playerAppearance;
