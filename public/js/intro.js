@@ -81,6 +81,33 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) audio
 
 async function boot() {
   screen('boot');
+  const loading = get('boot');
+  let cancelMinimum;
+  // Start the minimum after the existing screen has had a chance to paint.
+  const minimum = new Promise(resolve => {
+    let timer;
+    let firstFrame;
+    let secondFrame;
+    let finished = false;
+    const finish = () => {
+      finished = true;
+      clearTimeout(timer);
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+      motion.removeEventListener('change', onMotion);
+      resolve();
+    };
+    const onMotion = () => { if (motion.matches) finish(); };
+    cancelMinimum = finish;
+    firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => {
+        if (finished) return;
+        if (motion.matches) { finish(); return; }
+        timer = setTimeout(finish, 3000);
+        motion.addEventListener('change', onMotion);
+      });
+    });
+  });
   const progress = get('boot-progress');
   progress.value = 10;
   const messages = ['Cargando creatividad...', 'Organizando ideas...', 'Renderizando píxeles...', 'Conectando estrategia + creatividad...'];
@@ -91,18 +118,38 @@ async function boot() {
     get('boot-message').textContent = messages[index % messages.length];
   }, 450);
   try {
-    await game.ready;
+    await Promise.all([game.ready, minimum]);
     clearInterval(interval);
     progress.value = 100;
     get('boot-message').textContent = 'Todo listo ✓';
-    // A single painted frame, not an artificial loading delay.
-    await new Promise(resolve => requestAnimationFrame(resolve));
     screen('welcome');
+    if (!motion.matches) {
+      // Keep the opaque loading over the already-rendered welcome during fade.
+      loading.hidden = false;
+      loading.inert = true;
+      loading.classList.add('boot-finishing');
+      get('welcome').inert = true;
+      const fade = loading.animate([{ opacity: 1 }, { opacity: 0 }],
+        { duration: 350, easing: 'ease-out', fill: 'forwards' });
+      const stopFade = () => { if (motion.matches) fade.finish(); };
+      motion.addEventListener('change', stopFade);
+      try { await fade.finished; } finally {
+        motion.removeEventListener('change', stopFade);
+        loading.hidden = true;
+        fade.cancel();
+        loading.classList.remove('boot-finishing');
+        loading.inert = false;
+        get('welcome').inert = false;
+      }
+    }
+    get('enter').focus({ preventScroll: true });
   } catch {
     clearInterval(interval);
     get('boot-message').textContent = 'No se pudo cargar a KARLX. Recargá la página para volver a intentarlo.';
     get('retry').hidden = false;
     get('retry').focus();
+  } finally {
+    cancelMinimum();
   }
 }
 get('retry').addEventListener('click', () => location.reload());

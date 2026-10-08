@@ -2,6 +2,7 @@
 .entry-overlay,.phone-message,.world-arrival,.audio-controls,.entry-toast,.movement-tip,.entry-noscript{--pearl:#f7f6fb;--silver:#e6e6ef;--pink:#f535af;--lilac:#c8b4ff;--ice:#a7e8ff;--lime:#d1ffe6;--ink:#1a1a1f;--muted:#656577;--line:#b6b9ce;font-family:Inter,Arial,sans-serif;color:var(--ink)}
 .entry-overlay{position:fixed;inset:0;z-index:20;background:var(--pearl);transition:opacity .35s ease}
 .entry-overlay[hidden],.entry-screen[hidden],[hidden].world-arrival,[hidden].movement-tip,[hidden].entry-toast{display:none}.entry-overlay.is-leaving{opacity:0;pointer-events:none}
+#boot.boot-finishing{position:absolute;inset:0;z-index:1;pointer-events:none}
 .entry-screen{height:100%;min-height:100%;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:safe center;padding:52px 4vw 92px;background:radial-gradient(ellipse at 95% 5%,#a7e8ff40,transparent 45%),radial-gradient(ellipse at 0% 95%,#c8b4ff30,transparent 40%),linear-gradient(90deg,#dcdfea70 1px,transparent 1px),linear-gradient(#dcdfea70 1px,transparent 1px),var(--pearl);background-size:auto,auto,64px 64px,64px 64px,auto}.boot-screen{text-align:center}.boot-mark{font-size:28px;color:#a596c6;margin-bottom:8px}
 .entry-overlay .chrome-title{font:700 clamp(32px,5vw,64px)/1.05 'Space Grotesk',Arial,sans-serif;letter-spacing:-.05em;margin:0;color:var(--ink);text-shadow:none}
 /* The original logo has an opaque black background. Keep it unaltered;
