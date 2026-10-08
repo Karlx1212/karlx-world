@@ -8,7 +8,7 @@ const server=http.createServer((req,res)=>{
  if(!file.startsWith(root+path.sep))return res.writeHead(403).end();
  fs.readFile(file,(error,data)=>{
   if(error)return res.writeHead(404).end();
-  res.setHeader('Content-Type',{'.js':'text/javascript','.html':'text/html','.css':'text/css','.png':'image/png','.woff2':'font/woff2'}[path.extname(file)]||'application/octet-stream');
+  res.setHeader('Content-Type',{'.js':'text/javascript','.html':'text/html','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.woff2':'font/woff2'}[path.extname(file)]||'application/octet-stream');
   if(file.endsWith(path.join('js','game.js'))){
    data=Buffer.from(data.toString().replace('update(dt);render(time);requestAnimationFrame(frame);','update(dt);render(window.__fountainTime ?? time);requestAnimationFrame(frame);')+'\nwindow.__fountainTest={player,view,render,update,blocked,clearInput,keys};');
   }
@@ -56,7 +56,7 @@ const server=http.createServer((req,res)=>{
     const order=await page.evaluate(async({x,y})=>{
      const t=window.__fountainTest,{selectOutfit}=await import('/js/player-state.js');selectOutfit('outfit-01');t.clearInput();t.player.x=x;t.player.y=y;t.player.facing='down';t.update(0);
      const ctx=document.querySelector('#world').getContext('2d'),draw=ctx.drawImage,calls=[];
-     ctx.drawImage=function(image,...args){calls.push({src:image.src,args});return draw.call(this,image,...args)};
+     ctx.drawImage=function(image,...args){calls.push({src:image.src ?? '[cached canvas]',args});return draw.call(this,image,...args)};
      t.render(0);ctx.drawImage=draw;return calls;
     },{x,y});
     const playerIndex=order.findIndex(c=>c.src.includes('/outfit-01-'));

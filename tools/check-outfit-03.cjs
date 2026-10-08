@@ -9,12 +9,13 @@ async function load(reducedMotion = false) {
   const callbacks = {}; let raf; let clock = 1000;
   const draws = [];
   const context2d = new Proxy({}, { get: (_, key) => key === 'createLinearGradient'
-    ? () => ({ addColorStop() {} }) : key === 'drawImage' ? (...args) => draws.push(args) : () => {} });
+    ? () => ({ addColorStop() {} }) : key === 'drawImage' ? (...args) => draws.push(args)
+    : ['getImageData','createImageData'].includes(key) ? (...args) => ({ data: new Uint8ClampedArray(args.at(-2)*args.at(-1)*4) }) : () => {} });
   const canvas = { getContext: () => context2d, getBoundingClientRect: () => ({ width: 1160, height: 790 }),
     addEventListener() {}, style: {}, focus() {} };
   const elements = { '#world': canvas, '#hud': {}, '#error': {}, '#back': { addEventListener() {} } };
   const context = vm.createContext({ console, Event, EventTarget,
-    document: { querySelector: key => elements[key], addEventListener() {} },
+    document: { querySelector: key => elements[key], addEventListener() {}, createElement: () => ({ getContext: () => context2d }) },
     window: { addEventListener: (type, fn) => { callbacks[type] = fn; } },
     localStorage: { getItem: k => storage.get(k), setItem: (k, v) => storage.set(k, v) },
     matchMedia: () => ({ matches: reducedMotion }), devicePixelRatio: 1,

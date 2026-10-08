@@ -14,7 +14,7 @@ const server = http.createServer((req,res) => {
   if(!file.startsWith(root+path.sep)) { res.writeHead(403).end(); return; }
   fs.readFile(file,(error,data)=>{
     if(error) { res.writeHead(404).end(); return; }
-    res.setHeader('Content-Type', {'.js':'text/javascript','.css':'text/css','.html':'text/html','.png':'image/png','.woff2':'font/woff2'}[path.extname(file)]||'application/octet-stream');res.end(data);
+    res.setHeader('Content-Type', {'.js':'text/javascript','.css':'text/css','.html':'text/html','.png':'image/png','.svg':'image/svg+xml','.woff2':'font/woff2'}[path.extname(file)]||'application/octet-stream');res.end(data);
   });
 });
 (async()=>{

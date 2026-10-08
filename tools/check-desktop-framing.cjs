@@ -7,7 +7,7 @@ fs.mkdirSync(output,{recursive:true});
 const server=http.createServer((req,res)=>{
  const file=path.resolve(root,'.'+(req.url==='/'?'/index.html':req.url));
  if(!file.startsWith(root+path.sep))return res.writeHead(403).end();
- fs.readFile(file,(error,data)=>{if(error)return res.writeHead(404).end();res.setHeader('Content-Type',{'.js':'text/javascript','.html':'text/html','.css':'text/css','.png':'image/png','.woff2':'font/woff2'}[path.extname(file)]||'application/octet-stream');
+ fs.readFile(file,(error,data)=>{if(error)return res.writeHead(404).end();res.setHeader('Content-Type',{'.js':'text/javascript','.html':'text/html','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.woff2':'font/woff2'}[path.extname(file)]||'application/octet-stream');
  if(file.endsWith(path.join('js','game.js')))data=Buffer.from(data.toString()+'\nwindow.__framing={player,view,render,update,keys,clearInput};');res.end(data)});
 });
 (async()=>{

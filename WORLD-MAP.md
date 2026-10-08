@@ -42,7 +42,8 @@ con profundidad propia según el pie proyectado de cada pieza. No se ordena
 toda la fuente por el borde inferior de la imagen. Los recortes son exclusivos:
 cada píxel aparece en una sola pieza, sin dobles alfas ni partes reconstruidas.
 
-El terreno y los caminos siguen siendo provisionales. La fuente usa únicamente
+El césped sigue siendo provisional. Plaza, caminos y paseo usan los nuevos
+materiales descritos en la sección Pavimento. La fuente usa únicamente
 los recursos aprobados de `fuente-magica-CAPAS-PARA-APROBACION.zip`, con la misma
 arquitectura estática en todos los frames y agua en máscaras autorizadas.
 `magical-fountain.js` selecciona uno de 32 frames a 60 ms a partir del timestamp
@@ -51,7 +52,7 @@ Movimiento reducido fija el agua en el frame 0. El degradado ambiental permanece
 `game.ready` espera la fuente; un fallo de carga usa el error del flujo existente.
 No hay interacciones, misiones ni decoración adicional.
 
-Pendiente de acabado: jardines y caminos, después de aprobación visual.
+Pendiente de acabado: jardines y vegetación, después de aprobación visual.
 Los recursos están en `public/assets/world/magical-fountain/`: once PNG fijos
 y cinco atlas de agua, aproximadamente 1.3 MB comprimidos y 30.4 MB de píxeles
 decodificados. Los atlas usan cuatro columnas y ocho filas, todos menores de
@@ -153,3 +154,47 @@ inyectan hooks en producción. Safari real no está disponible en este entorno.
 El encuadre de cámara y el CSS responsive no se modificaron. Al girar un móvil
 a una pantalla muy baja se puede recortar el cristal superior, conservando la
 visibilidad de la plataforma y el seguimiento de cámara original.
+
+## Pavimento pixel art — etapa 5
+
+`terrain.pavement` define dos texturas repetibles, borde interior de 8 unidades
+y cuatro rombos discretos. No se modifican plaza, polígonos de caminos, paseo,
+obstáculos, límites ni aparición. Las antiguas propiedades `color` se conservan
+en los datos; su dibujo plano se reemplaza por materiales.
+
+`pavement.js` recibe la definición del mapa mediante `preparePavement(map)`.
+Carga dos PNG opacos de 512 × 512 y un SVG pixelado de 24 × 16. Dibuja con
+CanvasPattern en coordenadas del mundo, con origen común (0,0). Nunca estira
+las texturas al ancho de un viewport o camino. La proporción y fase no cambian
+entre escritorio y móvil; solo se aplica la cámara existente al mundo completo.
+
+La plaza rosa y la unión de los cuatro caminos con el paseo crema se componen
+una sola vez en un canvas de 1400 × 960. Un borde rosado interior se obtiene
+de la máscara de la unión, sin líneas que corten las entradas al paseo. Usa
+el mismo recurso rosa con un tinte suave, sin una textura independiente.
+Los cuatro rombos se sitúan en (700,375), (485,560), (915,560) y (700,690).
+Todos son suelo no interactivo y se dibujan debajo de la fuente y del avatar.
+Durante cada render, el pavimento requiere un único drawImage, sin nuevas
+figuras procedimentales por frame ni temporizadores. La textura del césped
+y el degradado ambiental existentes siguen intactos.
+
+La preparación de los PNG refleja una muestra de cada original en una matriz
+2 × 2. Esto garantiza uniones exactas aunque el recurso IA original no sea
+periódico. El resultado tiene continuidad de colores y alfa entre bordes,
+sin huecos ni una cuadrícula de baldosas cuadradas. Hay simetría local en la
+repetición reflejada; las piedras usan filas alternadas y variantes suaves.
+`public/assets/world/pavement/SOURCE.md` guarda procedencia y prompts finales.
+
+```text
+node tools/prepare-pavement-assets.cjs PLAYWRIGHT_MODULE EDGE_EXECUTABLE PINK_SOURCE CREAM_SOURCE
+node tools/check-pavement.cjs PLAYWRIGHT_MODULE EDGE_EXECUTABLE
+```
+
+La prueba nativa de Canvas exige igualdad exacta de los bordes enfrentados y
+uniones internas, plaza opaca, ausencia de pintura fuera de la geometría
+original y conexiones crema sin bordes que las crucen. Compara todos los datos
+del mapa contra `952a5d5`, exceptuando la nueva configuración de materiales.
+También exige fuente, recursos, cámara, movimiento, colisiones, outfits, CSS
+e intro intactos. Los servidores de pruebas se actualizaron para servir el
+SVG como image/svg+xml y los harness de outfits admiten canvas fuera de pantalla.
+Las regresiones existentes conservan sus comprobaciones de comportamiento.

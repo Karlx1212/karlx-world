@@ -1,5 +1,6 @@
 import { worldMap } from './world-map.js';
 import { fountainReady, drawFountainGround, fountainDepthObjects } from './magical-fountain.js';
+import { preparePavement, drawPavement } from './pavement.js';
 import { playerState } from './player-state.js';
 import { getFrontWalkPreview } from './front-walk-preview.js';
 import { getLeftWalk } from './left-walk.js';
@@ -31,6 +32,7 @@ let view = { width: 1, height: 1, scale: 1, x: 0, y: 0 };
 // Future sound integration can subscribe without loading audio now.
 const gameEvents = new EventTarget();
 const obstacles = worldMap.obstacles;
+const pavementReady = preparePavement(worldMap);
 function resize() {
   const box = canvas.getBoundingClientRect();
   const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -63,9 +65,7 @@ function floor(time){
   rect(0,0,WORLD.width,WORLD.height,t.color);
   const texture=t.texture;
   for(let i=0;i<texture.count;i++){let x=(i*texture.xStep)%WORLD.width,y=(i*texture.yStep)%WORLD.height;rect(x,y,texture.w,texture.h,texture.colors[i%3?1:0]);}
-  const p=t.plaza;rect(p.x,p.y,p.w,p.h,p.color);
-  for(const path of t.paths)poly(path.points,path.color);
-  const a=t.promenade;ellipse(a.x,a.y,a.rx,a.ry,a.color);
+  drawPavement(ctx);
   for(const object of worldMap.objects.filter(o=>o.layer==='ground'))drawMapObject(object,time);
   for(const object of worldMap.objects.filter(o=>o.kind==='fountain'))drawFountainGround(ctx,object,time,reducedMotion);
 }
@@ -202,7 +202,7 @@ export const game = {
       spriteSource: preview?.manifest.src ?? (['outfit-01', 'outfit-02', 'outfit-03', 'outfit-04'].includes(player.outfit) ? null : character.src),
       usesFallback: !preview && !['outfit-01', 'outfit-02', 'outfit-03', 'outfit-04'].includes(player.outfit), pose: preview?.isIdle ? 'idle' : preview ? 'walk' : 'temporary' };
   },
-  ready: Promise.all([assetsReady, outfit01IdleReady, outfit02Ready, outfit03Ready, outfit04Ready, fountainReady]),
+  ready: Promise.all([assetsReady, outfit01IdleReady, outfit02Ready, outfit03Ready, outfit04Ready, fountainReady, pavementReady]),
   events: gameEvents,
   reveal() { hud.hidden=false; active=false; clearInput(); canvas.style.touchAction='auto'; },
   resume() { if(!ready)return; active=true; clearInput(); canvas.style.touchAction='none'; canvas.focus({preventScroll:true}); gameEvents.dispatchEvent(new Event('enter')); },
