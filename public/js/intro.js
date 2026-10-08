@@ -17,17 +17,30 @@ let toastTimer;
 let tipTimer;
 let messageGeneration = 0;
 const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+// Decode original portraits before changing the visible image or its geometry.
+const portraits = new Map(outfits.map(outfit => {
+  const image = new Image();
+  image.src = outfit.idle;
+  return [outfit.key, image.decode().then(() => image, () => null)];
+}));
+let portraitGeneration = 0;
 function renderOutfit() {
   const selectedOutfit = playerState.outfit;
   const portrait = get('outfit-portrait');
-  portrait.src = selectedOutfit.idle;
-  portrait.alt = `KARLX, outfit ${selectedOutfit.id}`;
-  const { width, height, bounds: [left, top, right, bottom] } = selectedOutfit.presentation;
-  const scale = 204 / (bottom - top);
-  portrait.style.setProperty('--avatar-width', `${width * scale / 92 * 100}%`);
-  portrait.style.setProperty('--avatar-height', `${height * scale / 216 * 100}%`);
-  portrait.style.setProperty('--avatar-left', `${(46 - (left + right) * scale / 2) / 92 * 100}%`);
-  portrait.style.setProperty('--avatar-top', `${(6 - top * scale) / 216 * 100}%`);
+  const run = ++portraitGeneration;
+  portraits.get(selectedOutfit.key).then(image => {
+    if (!image || run !== portraitGeneration) return;
+    const { width, height, bounds: [left, top, right, bottom] } = selectedOutfit.presentation;
+    const scale = 204 / (bottom - top);
+    portrait.width = image.naturalWidth;
+    portrait.height = image.naturalHeight;
+    portrait.src = selectedOutfit.idle;
+    portrait.alt = `KARLX, outfit ${selectedOutfit.id}`;
+    portrait.style.setProperty('--avatar-width', `${width * scale / 92 * 100}%`);
+    portrait.style.setProperty('--avatar-height', `${height * scale / 216 * 100}%`);
+    portrait.style.setProperty('--avatar-left', `${(46 - (left + right) * scale / 2) / 92 * 100}%`);
+    portrait.style.setProperty('--avatar-top', `${(6 - top * scale) / 216 * 100}%`);
+  });
   get('outfit-label').textContent = `KARLX / ${selectedOutfit.id}`;
   get('outfit-class').textContent = selectedOutfit.className;
   get('outfit-ability').textContent = selectedOutfit.ability;

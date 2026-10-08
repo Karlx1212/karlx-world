@@ -23,6 +23,7 @@ async function scenario({ reduced = false, readyAt = 0, failure = false, reduceA
   const outfits = ['01','02','03','04'].map(id => ({ id, key: 'outfit-'+id, idle: '', presentation: { width:1, height:1, bounds:[0,0,1,1] } }));
   let selected=outfits[0];
   const context = vm.createContext({ document: { getElementById: get, addEventListener() {}, body: { append() {} } }, matchMedia: () => motion,
+    Image: class { naturalWidth = 368; naturalHeight = 1024; decode() { return Promise.resolve(); } },
     setTimeout: (fn, ms) => schedule(fn, ms), clearTimeout: id => timers.delete(id),
     setInterval: (fn, ms) => schedule(fn, ms, ms), clearInterval: id => timers.delete(id),
     requestAnimationFrame: fn => schedule(fn, 16), cancelAnimationFrame: id => timers.delete(id), location: { reload() {} } });
