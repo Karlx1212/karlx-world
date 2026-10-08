@@ -26,22 +26,20 @@ export const worldMap = {
   terrain: {
     color: '#a5c2aa',
     pavement: {
-      plaza: { src: '/assets/world/pavement/pearl-pink.png', tint: '#a967b04d' },
-      paths: { src: '/assets/world/pavement/cream-stone.png', tint: '#fff5d966' },
-      borderWidth: 8,
-      ornament: { src: '/assets/world/pavement/pearl-star.svg', width: 24, height: 16,
-        positions: [{ x: 700, y: 375 }, { x: 485, y: 560 }, { x: 915, y: 560 }, { x: 700, y: 690 }] },
+      plaza: { src: '/assets/world/pavement/octagonal-pink.png', tint: '#fff1e91a' },
+      paths: { src: '/assets/world/pavement/octagonal-cream.png' },
+      curb: { src: '/assets/world/pavement/octagonal-curb.png' },
+      borderWidth: 16,
     },
     texture: { count: 430, xStep: 137, yStep: 79, w: 3, h: 2, colors: ['#bdd0ad', '#96b69d'] },
-    plaza: { x: 400, y: 350, w: 600, h: 450, color: '#ded7e2' },
+    plaza: { x: 400, y: 350, w: 600, h: 450,
+      points: [[550,350],[850,350],[1000,470],[1000,680],[850,800],[550,800],[400,680],[400,470]] },
     paths: [
       { id: 'north', points: [[640,330],[760,330],[760,460],[640,460]], color: '#eee5d9' },
       { id: 'south', points: [[640,580],[760,580],[760,915],[640,915]], color: '#eee5d9' },
       { id: 'west', points: [[42,500],[580,500],[580,620],[42,620]], color: '#eee5d9' },
       { id: 'east', points: [[820,500],[1358,500],[1358,620],[820,620]], color: '#eee5d9' },
     ],
-    // Filled ellipse is the continuous walkable apron around the basin.
-    promenade: { x: 700, y: 520, rx: 190, ry: 130, color: '#eee5d9' },
   },
   ambient: { background: '#a5c2aa', shade: [[0,'#7672a31a'],[.7,'#ffffff00'],[1,'#51496d26']] },
 };

@@ -23,7 +23,7 @@ const server = http.createServer((req,res)=>{
   const browser=await chromium.launch({headless:true,executablePath:process.argv[3]});
   try {
     for(const mobile of [false,true]) for(const reduced of [false,true]) {
-      const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile,reducedMotion:reduced?'reduce':'no-preference'});
+      const context=await browser.newContext({viewport:mobile?{width:375,height:812}:{width:1920,height:900},isMobile:mobile,hasTouch:mobile,reducedMotion:reduced?'reduce':'no-preference'});
       const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
       await page.goto(`http://127.0.0.1:${server.address().port}`);
       assert.equal(await page.locator('#welcome').isVisible(),true);
@@ -51,6 +51,7 @@ const server = http.createServer((req,res)=>{
         {id:'east',points:[[820,500],[1358,500],[1358,620],[820,620]]},
       ]);
       assert.equal(definition.plaza.x,400);assert.equal(definition.plaza.y,350);assert.equal(definition.plaza.w,600);assert.equal(definition.plaza.h,450);
+      assert.deepEqual(definition.plaza.points,[[550,350],[850,350],[1000,470],[1000,680],[850,800],[550,800],[400,680],[400,470]]);
       const result=await page.evaluate(async()=>{
         const t=window.__worldTest;const {selectOutfit}=await import('/js/player-state.js');const {game}=await import('/js/game.js');
         const verify=(ok,message)=>{if(!ok)throw Error(message);};

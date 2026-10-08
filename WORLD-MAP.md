@@ -155,46 +155,37 @@ El encuadre de cámara y el CSS responsive no se modificaron. Al girar un móvil
 a una pantalla muy baja se puede recortar el cristal superior, conservando la
 visibilidad de la plataforma y el seguimiento de cámara original.
 
-## Pavimento pixel art — etapa 5
+## Plaza octogonal definitiva — etapa 5
 
-`terrain.pavement` define dos texturas repetibles, borde interior de 8 unidades
-y cuatro rombos discretos. No se modifican plaza, polígonos de caminos, paseo,
-obstáculos, límites ni aparición. Las antiguas propiedades `color` se conservan
-en los datos; su dibujo plano se reemplaza por materiales.
+La referencia aprobada es el boceto escritorio/móvil de la plaza octogonal.
+El pavimento rosa ocupa el polígono (550,350), (850,350), (1000,470),
+(1000,680), (850,800), (550,800), (400,680), (400,470), dentro del área
+600 × 450 anterior. Los cuatro caminos conservan sus coordenadas y ancho
+de 120 unidades. Se retiró el paseo elíptico y el relleno rectangular:
+los caminos crema llegan al octágono sin atravesar visualmente su interior.
 
-`pavement.js` recibe la definición del mapa mediante `preparePavement(map)`.
-Carga dos PNG opacos de 512 × 512 y un SVG pixelado de 24 × 16. Dibuja con
-CanvasPattern en coordenadas del mundo, con origen común (0,0). Nunca estira
-las texturas al ancho de un viewport o camino. La proporción y fase no cambian
-entre escritorio y móvil; solo se aplica la cámara existente al mundo completo.
+`terrain.pavement` define tres recursos PNG: rosa, crema y bordes de piedra.
+Las baldosas pequeñas usan juntas finas y una veladura perlada suave para
+reducir el contraste de las manchas del material rosa. No se añade anillo
+ornamental ni nuevas decoraciones. La hierba y el degradado permanecen iguales.
 
-La plaza rosa y la unión de los cuatro caminos con el paseo crema se componen
-una sola vez en un canvas de 1400 × 960. Un borde rosado interior se obtiene
-de la máscara de la unión, sin líneas que corten las entradas al paseo. Usa
-el mismo recurso rosa con un tinte suave, sin una textura independiente.
-Los cuatro rombos se sitúan en (700,375), (485,560), (915,560) y (700,690).
-Todos son suelo no interactivo y se dibujan debajo de la fuente y del avatar.
-Durante cada render, el pavimento requiere un único drawImage, sin nuevas
-figuras procedimentales por frame ni temporizadores. La textura del césped
-y el degradado ambiental existentes siguen intactos.
+`pavement.js` carga los recursos mediante la promesa existente de preparación
+del juego. Compone una sola superficie en coordenadas del mundo. Los polígonos
+son máscaras del arte raster, no sustitutos de las texturas. Los bordes usan
+fragmentos de piedra orientados a cada lado y esquina diagonal; una máscara
+de la unión elimina líneas interiores en los cuatro accesos. La superficie
+requiere un único drawImage por frame, debajo de la fuente y el avatar.
 
-La preparación de los PNG refleja una muestra de cada original en una matriz
-2 × 2. Esto garantiza uniones exactas aunque el recurso IA original no sea
-periódico. El resultado tiene continuidad de colores y alfa entre bordes,
-sin huecos ni una cuadrícula de baldosas cuadradas. Hay simetría local en la
-repetición reflejada; las piedras usan filas alternadas y variantes suaves.
-`public/assets/world/pavement/SOURCE.md` guarda procedencia y prompts finales.
+No se cambia game.js, cámara, responsive, movimiento, controles, profundidad,
+colisiones, llegada (700,640) ni fuente (700,520), escala .58. No hay nuevas
+colisiones asociadas al pavimento. Los materiales tienen fase y escala fija,
+independientes del viewport. Preparación y procedencia: SOURCE.md y
+tools/prepare-octagonal-pavement.cjs.
 
-```text
-node tools/prepare-pavement-assets.cjs PLAYWRIGHT_MODULE EDGE_EXECUTABLE PINK_SOURCE CREAM_SOURCE
-node tools/check-pavement.cjs PLAYWRIGHT_MODULE EDGE_EXECUTABLE
-```
-
-La prueba nativa de Canvas exige igualdad exacta de los bordes enfrentados y
-uniones internas, plaza opaca, ausencia de pintura fuera de la geometría
-original y conexiones crema sin bordes que las crucen. Compara todos los datos
-del mapa contra `952a5d5`, exceptuando la nueva configuración de materiales.
-También exige fuente, recursos, cámara, movimiento, colisiones, outfits, CSS
-e intro intactos. Los servidores de pruebas se actualizaron para servir el
-SVG como image/svg+xml y los harness de outfits admiten canvas fuera de pantalla.
-Las regresiones existentes conservan sus comprobaciones de comportamiento.
+check-pavement.cjs comprueba el octágono, cobertura, límites de superficie,
+uniones exactas de texturas y transiciones abiertas. Compara los datos del mapa
+con 952a5d5 salvo el pavimento y la superficie de plaza reemplazada; exige
+inalterados cámara, colisiones, fuente, outfits, intro y CSS. Las regresiones
+check-world-map y check-magical-fountain cubren circulación, cuatro outfits,
+entrada, controles táctiles, agua animada y movimiento reducido en Edge.
+Safari real no está disponible. Jardines y vegetación esperan aprobación visual.

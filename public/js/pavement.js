@@ -18,8 +18,11 @@ function pathShape(ctx, worldMap) {
     path.points.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
     ctx.closePath();
   }
-  const a = worldMap.terrain.promenade;
-  ctx.moveTo(a.x+a.rx,a.y);ctx.ellipse(a.x,a.y,a.rx,a.ry,0,0,Math.PI*2);ctx.closePath();
+}
+function plazaShape(ctx, worldMap) {
+  ctx.beginPath();
+  worldMap.terrain.plaza.points.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+  ctx.closePath();
 }
 function materialTile(material) {
   const image = images.get(material.src);
@@ -40,13 +43,15 @@ function build(worldMap) {
   const rose = materialTile(material.plaza);
   const cream = materialTile(material.paths);
   const p = worldMap.terrain.plaza;
-  ctx.fillStyle = ctx.createPattern(rose,'repeat');ctx.fillRect(p.x,p.y,p.w,p.h);
+
   ctx.save();pathShape(ctx,worldMap);ctx.clip();ctx.fillStyle=ctx.createPattern(cream,'repeat');ctx.fillRect(0,0,width,height);ctx.restore();
+  ctx.save();plazaShape(ctx,worldMap);ctx.clip();ctx.fillStyle=ctx.createPattern(rose,'repeat');ctx.fillRect(p.x,p.y,p.w,p.h);ctx.restore();
 
   // Rasterize the union once, then find its inside border. Internal overlaps
-  // (roads entering the promenade) never become decorative dividing lines.
+  // (roads entering the octagon) never become decorative dividing lines.
   const mask = canvas(width,height), mctx = mask.getContext('2d');
   pathShape(mctx,worldMap);mctx.fillStyle='#fff';mctx.fill();
+  plazaShape(mctx,worldMap);mctx.fill();
   const pixels = mctx.getImageData(0,0,width,height).data;
   const border = canvas(width,height), bctx = border.getContext('2d');
   const edge = bctx.createImageData(width,height), r = material.borderWidth;
@@ -59,17 +64,28 @@ function build(worldMap) {
   }
   bctx.putImageData(edge,0,0);
   const trim=canvas(width,height), tctx=trim.getContext('2d');
-  tctx.fillStyle=tctx.createPattern(rose,'repeat');tctx.fillRect(0,0,width,height);
-  tctx.globalCompositeOperation='source-atop';tctx.fillStyle='#a8799450';tctx.fillRect(0,0,width,height);
+  const curb=materialTile(material.curb);
+  tctx.imageSmoothingEnabled=false;
+  // Orient reusable stone sprites along each side, including the chamfers.
+  // The union mask removes stamps at the four open entrances.
+  for(const polygon of [p.points,...worldMap.terrain.paths.map(path=>path.points)]) {
+    polygon.forEach(([x,y],i)=>{
+      const [xx,yy]=polygon[(i+1)%polygon.length],length=Math.hypot(xx-x,yy-y);
+      tctx.save();tctx.translate(x,y);tctx.rotate(Math.atan2(yy-y,xx-x));
+      for(let d=0,index=0;d<length;d+=32,index++) {
+        const segment=Math.min(32,length-d);
+        tctx.drawImage(curb,(index%4)*32,0,segment,22,d,0,segment,r*1.5);
+      }
+      tctx.restore();
+    });
+  }
   tctx.globalCompositeOperation='destination-in';tctx.drawImage(border,0,0);
   ctx.drawImage(trim,0,0);
   ctx.imageSmoothingEnabled=false;
-  const ornament=material.ornament;
-  for(const {x,y} of ornament.positions)ctx.drawImage(images.get(ornament.src),x-ornament.width/2,y-ornament.height/2,ornament.width,ornament.height);
 }
 export function preparePavement(worldMap) {
   const material = worldMap.terrain.pavement;
-  return Promise.all([material.plaza.src,material.paths.src,material.ornament.src].map(load)).then(() => build(worldMap));
+  return Promise.all([material.plaza.src,material.paths.src,material.curb.src].map(load)).then(() => build(worldMap));
 }
 export function drawPavement(ctx) {
   if(!surface)return;
