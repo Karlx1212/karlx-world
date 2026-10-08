@@ -37,6 +37,15 @@ function resize() {
   canvas.height = Math.round(box.height*dpr);
   view.width = box.width; view.height = box.height;
   view.scale = Math.min(box.width/1160,box.height/790);
+  if (matchMedia('(max-width: 600px), (pointer: coarse) and (max-width: 1000px)').matches) {
+    // Frame the nearby world, rather than fitting a desktop-wide scene in a phone.
+    // Portrait keeps the avatar readable; landscape leaves room above its feet.
+    const portrait = box.height >= box.width;
+    const mobileScale = portrait ? Math.max(1.2, box.width/480, box.height/640)
+      : Math.min(Math.max(box.width/900, box.height/500), box.height/320);
+    // Never expose space beyond the world because the viewport is larger than it.
+    view.scale = Math.max(mobileScale, box.width/WORLD.width, box.height/WORLD.height);
+  }
 }
 new ResizeObserver(resize).observe(canvas);
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}

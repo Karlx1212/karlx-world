@@ -7,6 +7,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '../public');
 const output = process.argv[4];
+if(output) fs.mkdirSync(output,{recursive:true});
 const server = http.createServer((req,res)=>{
   const file=path.resolve(root,'.'+(req.url==='/'?'/index.html':req.url));
   if(!file.startsWith(root+path.sep)) return res.writeHead(403).end();
@@ -84,7 +85,10 @@ const server = http.createServer((req,res)=>{
         }
         for(const [x,y] of [[42,330],[700,640],[1358,915]]) {
           reset(x,y);t.render(1000);const v=t.view,w=v.width/v.scale,h=v.height/v.scale;
-          verify(v.scale===Math.min(v.width/1160,v.height/790),'camera scale');
+          if(matchMedia('(max-width: 600px), (pointer: coarse) and (max-width: 1000px)').matches) {
+            verify(w<=1400+1e-8&&h<=960+1e-8,'mobile viewport stays inside world');
+            verify(122*v.scale>=60,'mobile avatar is readable');
+          } else verify(v.scale===Math.min(v.width/1160,v.height/790),'desktop camera scale unchanged');
           verify(v.x===Math.max(0,Math.min(1400-w,x-w/2))&&v.y===Math.max(0,Math.min(960-h,y-h*.66)),'camera bounds');
         }
         reset();t.update(.05);return true;
@@ -107,9 +111,38 @@ const server = http.createServer((req,res)=>{
         assert.equal(await page.evaluate(()=>window.__worldTest.player.x),held);
       }
       const suffix=(mobile?'mobile':'desktop')+'-'+(reduced?'reduced':'normal');
+      if(mobile) await page.locator('#movement-tip').waitFor({state:'hidden'});
       for(const id of ['01','02','03','04']) {
         await page.evaluate(async id=>{(await import('/js/player-state.js')).selectOutfit('outfit-'+id);const t=window.__worldTest;t.clearInput();t.player.x=700;t.player.y=640;t.player.facing='down';t.update(0);},id);
-        if(output) await page.screenshot({path:path.join(output,`plaza-${suffix}-${id}.png`)});
+        if(output) {
+          await page.screenshot({path:path.join(output,`plaza-${suffix}-${id}.png`)});
+          const canvas=await page.evaluate(()=>document.querySelector('#world').toDataURL('image/png').split(',')[1]);
+          fs.writeFileSync(path.join(output,`canvas-${suffix}-${id}.png`),Buffer.from(canvas,'base64'));
+        }
+      }
+      if(output) {
+        fs.writeFileSync(path.join(output,`view-${suffix}.json`),JSON.stringify(await page.evaluate(()=>({...window.__worldTest.view})),null,2));
+        if(process.argv[5] && !mobile) for(const id of ['01','02','03','04']) {
+          const name=`canvas-${suffix}-${id}.png`;
+          assert.ok(fs.readFileSync(path.join(output,name)).equals(fs.readFileSync(path.join(process.argv[5],name))),'desktop pixels unchanged: '+name);
+        }
+      }
+      if(mobile) {
+        // Rotate and resize the same running game without resetting player or input.
+        for(const size of [{width:320,height:568},{width:844,height:390},{width:430,height:932}]) {
+          await page.setViewportSize(size);
+          await page.waitForFunction(()=>window.__worldTest.view.width===document.querySelector('#world').getBoundingClientRect().width);
+          const framing=await page.evaluate(()=>{
+            const t=window.__worldTest;t.render(1000);const v=t.view;
+            return {width:v.width,height:v.height,scale:v.scale,x:v.x,y:v.y,player:{x:t.player.x,y:t.player.y}};
+          });
+          assert.deepEqual(framing.player,{x:700,y:640},'resize preserves world position');
+          assert.ok(framing.width/framing.scale<=1400+1e-8 && framing.height/framing.scale<=960+1e-8,'no bands at mobile sizes');
+          const top=(460-framing.y)*framing.scale,bottom=(580-framing.y)*framing.scale;
+          assert.ok(top>=0 && bottom<=framing.height,'whole fountain visible at arrival');
+          assert.ok(122*framing.scale>=60,'readable avatar at mobile sizes');
+          if(output) await page.screenshot({path:path.join(output,`plaza-${size.width}x${size.height}-${reduced?'reduced':'normal'}.png`)});
+        }
       }
       assert.deepEqual(errors,[]);console.log('PASS plaza',suffix,': spawn, loop, four roads/outfits, collisions, boundaries, camera, touch and entry');
       await context.close();

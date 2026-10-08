@@ -38,13 +38,33 @@ original permanece. Movimiento reducido conserva poses fijas de los outfits.
 
 Pendiente de acabado: arte pixel RPG/Y2K, borde cromado, volumen de la fuente,
 jardines y vegetación. También queda evaluar el contorno rectangular conservador
-contra el contorno artístico final. El encuadre móvil mantiene la cámara actual:
-puede mostrar fondo fuera del mundo cuando la altura visible supera 960 unidades.
+contra el contorno artístico final.
+
+## Encuadre responsive
+
+La cámara mantiene el seguimiento horizontal centrado, los pies al 66 % del
+alto visible cuando los límites lo permiten, y el clamp original al mundo.
+La escala de escritorio sigue siendo `min(ancho/1160, alto/790)`.
+
+En pantallas de hasta 600 px, o con puntero principal táctil hasta 1000 px, el
+zoom se aplica uniformemente al mundo completo, sin cambiar ningún manifiesto
+de outfit. En vertical se usa `max(1.2, ancho/480, alto/640)`; en horizontal se
+usa `min(max(ancho/900, alto/500), alto/320)` para dejar espacio sobre el avatar.
+La escala móvil nunca es inferior a `max(ancho/1400, alto/960)`, de modo que el
+viewport visible cabe en el mundo y el clamp no expone bandas externas.
+
+Referencia Edge 390 × 844: canvas 376 × 765, escala anterior 0.324 y altura
+visible de 2360 unidades; la nueva escala 1.2 muestra 637.5 unidades de alto.
+El avatar de referencia pasa de 40 a 146 px y la fuente de 78 a 288 px de ancho.
+La plaza se explora mediante seguimiento de cámara; no se intenta mostrarla
+completa simultáneamente en el ancho del teléfono. El HUD, los controles y
+el flujo de entrada se conservan. ResizeObserver vuelve a calcular el encuadre
+al rotar o redimensionar, sin cambiar la posición del jugador.
 
 ## Validación
 
 ```text
-node tools/check-world-map.cjs PLAYWRIGHT_MODULE EDGE_EXECUTABLE SCREENSHOT_DIRECTORY
+node tools/check-world-map.cjs PLAYWRIGHT_MODULE EDGE_EXECUTABLE SCREENSHOT_DIRECTORY [BEFORE_DIRECTORY]
 node --experimental-vm-modules tools/check-outfit-02.cjs
 node --experimental-vm-modules tools/check-outfit-03.cjs
 node --experimental-vm-modules tools/check-outfit-04.cjs
@@ -54,12 +74,15 @@ node --experimental-vm-modules tools/check-initial-loading.cjs
 La prueba de mapa abre Edge en escritorio 1280 × 800 y móvil 390 × 844, con y
 sin movimiento reducido. Comprueba el flujo completo, aparición, los cuatro
 outfits/direcciones, vuelta completa a la fuente, acceso a los cuatro extremos,
-colisión desde cada lado, deslizamiento, diagonales, límites, fórmula de cámara
+colisión desde cada lado, deslizamiento, diagonales, límites, cámara responsive
 y ausencia de obstáculos antiguos mediante un muestreo del área transitable.
 El control móvil usa eventos táctiles reales enviados por CDP, incluyendo
 captura de puntero, movimiento y liberación. Los hooks se inyectan únicamente
 en respuestas HTTP locales, no en producción. Captura los cuatro outfits en
-cada tamaño/preferencia, fuera del repositorio.
+cada tamaño/preferencia, fuera del repositorio. También valida 320 × 568,
+844 × 390 y 430 × 932, la fuente visible al llegar y la posición conservada
+al redimensionar. El directorio opcional BEFORE_DIRECTORY permite exigir
+igualdad exacta de los PNG del canvas de escritorio antes y después.
 
 Las pruebas de entrada, tarjeta y retrato (`check-entry-browser`,
 `check-outfit-card`, `check-outfit-portrait`) completan las regresiones.
