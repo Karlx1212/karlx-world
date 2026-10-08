@@ -12,7 +12,7 @@ se utiliza 01 y el selector sigue funcionando.
 
 ## Apariencia jugable pendiente
 
-Reposo, otras direcciones y outfits siguen usando `/assets/characters/karlx/idle-front.png`,
+Reposo, derecha, arriba y otros outfits siguen usando `/assets/characters/karlx/idle-front.png`,
 con las dimensiones actuales de 52 × 122. Hay una prueba reversible para Outfit 01
 caminando hacia abajo: `front-walk-preview.js` carga una hoja de 896 × 256 con siete
 celdas de 128 × 256, poses 1–6 y 8, a 100 ms por frame. No se usa la pose 7 recortada.
@@ -23,6 +23,13 @@ Las diferencias de proporciones y la discontinuidad por omitir la pose 7 permane
 como limitaciones de esta prueba. Con movimiento reducido o fallo de carga se utiliza
 el recurso temporal. `game.playerAppearance` informa el recurso realmente dibujado.
 Los PNG del selector y las hojas antiguas no se utilizan en el canvas.
+
+Outfit 01 también utiliza `left-walk.js` al caminar hacia la izquierda: cuatro
+frames a 120 ms, hoja de 512 × 256, celdas de 128 × 256 y anclaje (64, 250).
+Las cuatro poses originales miden 771–772 px de altura visible; se prepararon
+con una única escala 224/772. Comparten el render y la escala 122/224 de la
+caminata frontal. No se modifica movimiento, cámara, colisiones ni reposo.
+Con movimiento reducido o fallo de carga se conserva el sprite temporal.
 
 Cada entrada de `public/js/outfits.js` tiene `animation: null`, reservado para el
 manifiesto validado de animaciones. Para completar la etapa visual hacen falta
