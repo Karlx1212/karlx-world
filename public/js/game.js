@@ -1,9 +1,11 @@
+import { playerState } from './player-state.js';
+
 const canvas = document.querySelector('#world');
 const ctx = canvas.getContext('2d');
 const hud = document.querySelector('#hud');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const WORLD = { width: 1400, height: 960 };
-const player = { x: 700, y: 580, speed: 210, moving: false, facing: 'down' };
+const player = { x: 700, y: 580, speed: 210, moving: false, facing: 'down', get outfit() { return playerState.activeOutfit; } };
 // Replace this manifest with professional directional frames later.
 const character = { src: '/assets/characters/karlx/idle-front.png', width: 52, height: 122 };
 const sprite = new Image();
@@ -150,6 +152,12 @@ const assetsReady = new Promise((resolve, reject) => { resolveReady = resolve; r
 sprite.onload=()=>{ready=true;resolveReady();};
 sprite.onerror=()=>{const error=document.querySelector('#error');error.hidden=false;error.textContent='No se pudo cargar a KARLX. Recargá la página para volver a intentarlo.';rejectReady(new Error('No se pudo cargar a KARLX.'));};
 export const game = {
+  get playerOutfit() { return player.outfit; },
+  // Animation manifests remain null until validated directional sprites exist.
+  // No outfit preview or unvalidated legacy sheet is loaded by the renderer.
+  get playerAppearance() {
+    return { outfit: player.outfit, animation: playerState.outfit.animation, spriteSource: character.src, usesFallback: true };
+  },
   ready: assetsReady,
   events: gameEvents,
   reveal() { hud.hidden=false; active=false; clearInput(); canvas.style.touchAction='auto'; },

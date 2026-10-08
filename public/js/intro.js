@@ -1,6 +1,7 @@
 import { game } from './game.js';
 import { audio } from './audio.js';
-import { outfits, readOutfit, saveOutfit } from './outfits.js';
+import { outfits } from './outfits.js';
+import { playerState, selectOutfit } from './player-state.js';
 
 const get = id => document.getElementById(id);
 const overlay = get('start');
@@ -14,8 +15,8 @@ let toastTimer;
 let tipTimer;
 let messageGeneration = 0;
 const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
-let selectedOutfit = readOutfit();
 function renderOutfit() {
+  const selectedOutfit = playerState.outfit;
   const portrait = get('outfit-portrait');
   portrait.src = selectedOutfit.idle;
   portrait.alt = `KARLX, outfit ${selectedOutfit.id}`;
@@ -28,9 +29,8 @@ function renderOutfit() {
   get('outfit-label').textContent = `KARLX / ${selectedOutfit.id}`;
 }
 function changeOutfit(direction) {
-  const index = outfits.indexOf(selectedOutfit);
-  selectedOutfit = outfits[(index + direction + outfits.length) % outfits.length];
-  saveOutfit(selectedOutfit);
+  const index = outfits.indexOf(playerState.outfit);
+  selectOutfit(outfits[(index + direction + outfits.length) % outfits.length].key);
   renderOutfit();
 }
 get('outfit-previous').addEventListener('click', () => changeOutfit(-1));

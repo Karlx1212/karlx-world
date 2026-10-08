@@ -6,6 +6,7 @@ const bounds = [[8,42,368,981],[8,42,371,980],[0,42,362,981],[0,42,360,971]];
 const widths = [368,371,362,408];
 export const outfits = ['01', '02', '03', '04'].map((id, index) => ({
   id,
+  key: `outfit-${id}`,
   idle: `/assets/characters/karlx/outfits/outfit-${id}-idle.png`,
   spriteSheet: `/assets/characters/karlx/outfits/outfit-${id}-sprites.png`,
   animation: null,
