@@ -45,6 +45,10 @@ function resize() {
       : Math.min(Math.max(box.width/900, box.height/500), box.height/320);
     // Never expose space beyond the world because the viewport is larger than it.
     view.scale = Math.max(mobileScale, box.width/WORLD.width, box.height/WORLD.height);
+  } else {
+    // The camera cannot center a viewport wider/taller than its world bounds.
+    // Preserve the desktop scale unless it would expose space outside the map.
+    view.scale = Math.max(view.scale, box.width/WORLD.width, box.height/WORLD.height);
   }
 }
 new ResizeObserver(resize).observe(canvas);

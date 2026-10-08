@@ -44,7 +44,13 @@ contra el contorno artístico final.
 
 La cámara mantiene el seguimiento horizontal centrado, los pies al 66 % del
 alto visible cuando los límites lo permiten, y el clamp original al mundo.
-La escala de escritorio sigue siendo `min(ancho/1160, alto/790)`.
+La escala de escritorio parte de `min(ancho/1160, alto/790)` y se eleva solo
+si el viewport excede el mundo: `max(escalaBase, ancho/1400, alto/960)`.
+Esto permite que el clamp centre la fuente en X=700 al llegar, sin dibujar
+espacio fuera del mapa. La posición del jugador sigue siendo (700, 640).
+Antes, en un viewport 1920 × 900, el canvas 1880 × 795 mostraba 1868 unidades
+horizontales; cámara X=0 y fuente desplazada 236 px. No era una transición:
+la cámara antes del cierre del teléfono y los primeros frames coincidían.
 
 En pantallas de hasta 600 px, o con puntero principal táctil hasta 1000 px, el
 zoom se aplica uniformemente al mundo completo, sin cambiar ningún manifiesto
@@ -89,3 +95,22 @@ Las pruebas de entrada, tarjeta y retrato (`check-entry-browser`,
 La comparación pixel a pixel contra el escenario de la etapa 1 ya no aplica:
 la geometría cambia intencionalmente. Sus referencias anteriores siguen fuera
 del repositorio para revisión histórica.
+
+## Regresión del encuadre inicial de escritorio
+
+```text
+node tools/check-desktop-framing.cjs PLAYWRIGHT_MODULE EDGE_EXECUTABLE OUTPUT_DIRECTORY [BEFORE_DIRECTORY]
+```
+
+El argumento final `baseline` registra el estado previo sin exigir centrado.
+La prueba abre sesiones nuevas, selecciona cada outfit y completa la entrada.
+Mide doce frames consecutivos inmediatamente después de EXPLORAR, sin tocar
+teclado/táctil ni alterar la posición. Exige fuente centrada (menos de 0.5 px),
+llegada original, cámara estable e igual a la del teléfono y viewport dentro del
+mundo. Después valida movimiento, seguimiento y regreso al punto inicial.
+Cubre 1280 × 800, 1920 × 900 y 2560 × 1080. Incluye una entrada normal sin
+movimiento reducido y casos con movimiento reducido.
+También prueba iPhone X 375 × 812, DPR 3, con insets sintéticos 44/34; compara
+los PNG puros del canvas antes/después para los cuatro outfits. Eso demuestra
+que este cambio de escritorio no altera el render móvil emulado, sin equivaler
+a una prueba de Safari real. Las capturas se guardan fuera del repositorio.

@@ -88,7 +88,7 @@ const server = http.createServer((req,res)=>{
           if(matchMedia('(max-width: 600px), (pointer: coarse) and (max-width: 1000px)').matches) {
             verify(w<=1400+1e-8&&h<=960+1e-8,'mobile viewport stays inside world');
             verify(122*v.scale>=60,'mobile avatar is readable');
-          } else verify(v.scale===Math.min(v.width/1160,v.height/790),'desktop camera scale unchanged');
+          } else verify(v.scale===Math.max(Math.min(v.width/1160,v.height/790),v.width/1400,v.height/960),'desktop viewport fits world');
           verify(v.x===Math.max(0,Math.min(1400-w,x-w/2))&&v.y===Math.max(0,Math.min(960-h,y-h*.66)),'camera bounds');
         }
         reset();t.update(.05);return true;
