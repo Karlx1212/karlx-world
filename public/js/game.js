@@ -3,6 +3,7 @@ import { getFrontWalkPreview } from './front-walk-preview.js';
 import { getLeftWalk } from './left-walk.js';
 import { getRightWalk } from './right-walk.js';
 import { getBackWalk } from './back-walk.js';
+import { getOutfit01Idle, outfit01IdleReady } from './outfit-01-idle.js';
 
 const canvas = document.querySelector('#world');
 const ctx = canvas.getContext('2d');
@@ -102,9 +103,12 @@ function planter(x,y){ellipse(x,y+4,24,8,'#62756e45');poly([[x-20,y-24],[x+20,y-
 function getWalkAnimation() {
   return getBackWalk(player, walkTime, reducedMotion) ?? getRightWalk(player, walkTime, reducedMotion) ?? getLeftWalk(player, walkTime, reducedMotion) ?? getFrontWalkPreview(player, walkTime, reducedMotion);
 }
+function getCharacterPose() {
+  return getWalkAnimation() ?? getOutfit01Idle(player);
+}
 function drawPlayer(){
   ellipse(player.x,player.y+3,23,8,'#3e45674a');
-  const preview = getWalkAnimation();
+  const preview = getCharacterPose();
   if (preview) {
     const { image, manifest: m, frame } = preview;
     ctx.imageSmoothingEnabled = false;
@@ -113,6 +117,8 @@ function drawPlayer(){
       m.frameWidth*m.scale, m.frameHeight*m.scale);
     return;
   }
+  // Outfit 01 never falls back to the old character, including while loading.
+  if (player.outfit === 'outfit-01') return;
   const bounce=player.moving&&!reducedMotion?Math.sin(walkTime*17)*2:0;
   ctx.imageSmoothingEnabled=true;
   ctx.drawImage(sprite,player.x-character.width/2,player.y-character.height+bounce,character.width,character.height);
@@ -176,11 +182,12 @@ export const game = {
   get playerOutfit() { return player.outfit; },
   // Report the actual resource: Outfit 01 has all four walking directions.
   get playerAppearance() {
-    const preview = getWalkAnimation();
-    return { outfit: player.outfit, animation: preview?.manifest ?? null,
-      spriteSource: preview?.manifest.src ?? character.src, usesFallback: !preview };
+    const preview = getCharacterPose();
+    return { outfit: player.outfit, animation: preview?.isIdle ? null : preview?.manifest ?? null,
+      spriteSource: preview?.manifest.src ?? (player.outfit === 'outfit-01' ? null : character.src),
+      usesFallback: player.outfit !== 'outfit-01', pose: preview?.isIdle ? 'idle' : preview ? 'walk' : 'temporary' };
   },
-  ready: assetsReady,
+  ready: Promise.all([assetsReady, outfit01IdleReady]),
   events: gameEvents,
   reveal() { hud.hidden=false; active=false; clearInput(); canvas.style.touchAction='auto'; },
   resume() { if(!ready)return; active=true; clearInput(); canvas.style.touchAction='none'; canvas.focus({preventScroll:true}); gameEvents.dispatchEvent(new Event('enter')); },
