@@ -7,7 +7,7 @@ const widths = [368,371,362,408];
 const classes = [
   { className: 'CONTENT CREATOR', ability: 'VIRAL MODE', description: 'Convierte ideas en contenido atractivo, detecta tendencias y conecta con nuevas audiencias.' },
   { className: 'COMMUNITY MANAGER', ability: 'COMMUNITY PULSE', description: 'Construye comunidades, genera conversaciones y transforma seguidores en conexiones reales.' },
-  { className: 'EDITORIAL', ability: 'STORY VISION', description: 'Transforma conceptos en historias visuales con identidad, intención y dirección creativa.' },
+  { className: 'PRODUCCIÓN AUDIOVISUAL', ability: 'VISIÓN NARRATIVA', description: 'Transforma ideas en producciones audiovisuales impactantes mediante la edición, el ritmo y la narrativa visual.' },
   { className: 'DISEÑADORA GRÁFICA', ability: 'PIXEL PERFECT', description: 'Convierte ideas en identidades visuales, composiciones y piezas gráficas memorables.' },
 ];
 export const outfits = ['01', '02', '03', '04'].map((id, index) => ({

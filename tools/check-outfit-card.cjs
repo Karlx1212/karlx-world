@@ -6,7 +6,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const classes = [
   ['CONTENT CREATOR','VIRAL MODE'], ['COMMUNITY MANAGER','COMMUNITY PULSE'],
-  ['EDITORIAL','STORY VISION'], ['DISEÑADORA GRÁFICA','PIXEL PERFECT'],
+  ['PRODUCCIÓN AUDIOVISUAL','VISIÓN NARRATIVA'], ['DISEÑADORA GRÁFICA','PIXEL PERFECT'],
 ];
 const root = path.resolve(__dirname, '../public');
 const server = http.createServer((req,res) => {
@@ -34,6 +34,7 @@ const server = http.createServer((req,res) => {
    if(!mobile)assert.ok(layout.button.bottom>=layout.card.bottom,'action remains at bottom of right column');
    assert.equal(layout.descriptionRight,true);assert.equal(layout.descriptionCount,1);assert.ok(layout.descriptionRect.bottom<=layout.profile.top,'description does not overlap profile');
    assert.equal(layout.inside,true);assert.equal(layout.overflow,false);assert.ok(layout.label.bottom<=layout.preview.top);assert.ok(layout.details.top>=layout.preview.bottom);assert.ok(layout.details.bottom<=layout.card.bottom);assert.equal(layout.className,classes[i][0]);assert.ok(layout.card.bottom-layout.card.top>320);
+   if(i===2)assert.equal(layout.description,'Transforma ideas en producciones audiovisuales impactantes mediante la edición, el ritmo y la narrativa visual.');
    if(process.argv[4]) {
     if(mobile) {
      await page.locator('#outfit-label').scrollIntoViewIfNeeded();

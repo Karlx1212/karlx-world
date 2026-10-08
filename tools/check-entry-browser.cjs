@@ -6,7 +6,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const classes = [
   ['CONTENT CREATOR','VIRAL MODE'], ['COMMUNITY MANAGER','COMMUNITY PULSE'],
-  ['EDITORIAL','STORY VISION'], ['DISEÑADORA GRÁFICA','PIXEL PERFECT'],
+  ['PRODUCCIÓN AUDIOVISUAL','VISIÓN NARRATIVA'], ['DISEÑADORA GRÁFICA','PIXEL PERFECT'],
 ];
 const root = path.resolve(__dirname, '../public');
 const server = http.createServer((req,res) => {
