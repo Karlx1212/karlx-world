@@ -1,6 +1,7 @@
 import { playerState } from './player-state.js';
 import { getFrontWalkPreview } from './front-walk-preview.js';
 import { getLeftWalk } from './left-walk.js';
+import { getRightWalk } from './right-walk.js';
 
 const canvas = document.querySelector('#world');
 const ctx = canvas.getContext('2d');
@@ -98,7 +99,7 @@ function lamp(x,y,time){ellipse(x,y,18,7,'#526e7140');rect(x-3,y-110,6,110,'#666
 function sign(x,y){rect(x-3,y-90,6,90,'#8d869a');rect(x-62,y-101,124,44,'#f5eddc');rect(x-65,y-105,130,4,'#9586ad');text('BARRIO CREATIVO',x,y-83,9);text('FUND. ~2000',x,y-68,8,'#9d829a');}
 function planter(x,y){ellipse(x,y+4,24,8,'#62756e45');poly([[x-20,y-24],[x+20,y-24],[x+15,y+3],[x-15,y+3]],'#b49fac');ellipse(x,y-24,21,6,'#ddc3cc');for(let i=0;i<6;i++){line(x,y-24,x+(i-3)*6,y-48-(i%2)*13,'#647f76',3);ellipse(x+(i-3)*6,y-48-(i%2)*13,7,13,i%2?'#8caa91':'#aaba8c');}}
 function getWalkAnimation() {
-  return getLeftWalk(player, walkTime, reducedMotion) ?? getFrontWalkPreview(player, walkTime, reducedMotion);
+  return getRightWalk(player, walkTime, reducedMotion) ?? getLeftWalk(player, walkTime, reducedMotion) ?? getFrontWalkPreview(player, walkTime, reducedMotion);
 }
 function drawPlayer(){
   ellipse(player.x,player.y+3,23,8,'#3e45674a');
@@ -172,7 +173,7 @@ sprite.onload=()=>{ready=true;resolveReady();};
 sprite.onerror=()=>{const error=document.querySelector('#error');error.hidden=false;error.textContent='No se pudo cargar a KARLX. Recargá la página para volver a intentarlo.';rejectReady(new Error('No se pudo cargar a KARLX.'));};
 export const game = {
   get playerOutfit() { return player.outfit; },
-  // Report the actual resource: Outfit 01 has front and left walking sheets.
+  // Report the actual resource: Outfit 01 has front, left and right walking sheets.
   get playerAppearance() {
     const preview = getWalkAnimation();
     return { outfit: player.outfit, animation: preview?.manifest ?? null,
