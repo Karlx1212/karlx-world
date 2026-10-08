@@ -26,8 +26,8 @@ export const worldMap = {
   terrain: {
     color: '#a5c2aa',
     pavement: {
-      plaza: { src: '/assets/world/pavement/pearl-pink.png' },
-      paths: { src: '/assets/world/pavement/cream-stone.png' },
+      plaza: { src: '/assets/world/pavement/pearl-pink.png', tint: '#a967b04d' },
+      paths: { src: '/assets/world/pavement/cream-stone.png', tint: '#fff5d966' },
       borderWidth: 8,
       ornament: { src: '/assets/world/pavement/pearl-star.svg', width: 24, height: 16,
         positions: [{ x: 700, y: 375 }, { x: 485, y: 560 }, { x: 915, y: 560 }, { x: 700, y: 690 }] },

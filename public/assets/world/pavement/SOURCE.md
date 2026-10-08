@@ -7,6 +7,15 @@ generadas de Codex, sin referencias del juego a archivos externos al proyecto.
 
 ## Recursos finales
 
+## Revisión de contraste
+
+Referencias consultadas: [RPG Village Tileset](https://pita.itch.io/rpg-village-tileset)
+y [Retro RPG Stone Plaza & Park](https://khaledpng.itch.io/retro-rpg-stone-plaza-park-2d-top-down-tileset).
+Se toman como orientación para distinguir materiales; no se incorporan sus recursos.
+La plaza recibe una veladura rosa lavanda y los senderos una veladura marfil cálida,
+aplicadas una vez a las texturas en Canvas. Se conservan los PNG, sus detalles,
+las uniones repetibles y toda la geometría. Los colores se definen en world-map.js.
+
 - `pearl-pink.png`: piedra rosa perlada, crema y lavanda para la plaza.
 - `cream-stone.png`: piedra crema cálida para caminos y paseo.
 - Ambos PNG son 512 × 512, completamente opacos, formados por cuatro reflejos

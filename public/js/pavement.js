@@ -21,12 +21,24 @@ function pathShape(ctx, worldMap) {
   const a = worldMap.terrain.promenade;
   ctx.moveTo(a.x+a.rx,a.y);ctx.ellipse(a.x,a.y,a.rx,a.ry,0,0,Math.PI*2);ctx.closePath();
 }
+function materialTile(material) {
+  const image = images.get(material.src);
+  const tile = canvas(image.naturalWidth, image.naturalHeight);
+  const ctx = tile.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+  // Color grades retain the original pixel clusters and repeat boundaries.
+  if (material.tint) {
+    ctx.fillStyle = material.tint;
+    ctx.fillRect(0, 0, tile.width, tile.height);
+  }
+  return tile;
+}
 function build(worldMap) {
   const material = worldMap.terrain.pavement;
   const { width, height } = worldMap.dimensions;
   surface = canvas(width,height);const ctx = surface.getContext('2d');
-  const rose = images.get(material.plaza.src);
-  const cream = images.get(material.paths.src);
+  const rose = materialTile(material.plaza);
+  const cream = materialTile(material.paths);
   const p = worldMap.terrain.plaza;
   ctx.fillStyle = ctx.createPattern(rose,'repeat');ctx.fillRect(p.x,p.y,p.w,p.h);
   ctx.save();pathShape(ctx,worldMap);ctx.clip();ctx.fillStyle=ctx.createPattern(cream,'repeat');ctx.fillRect(0,0,width,height);ctx.restore();

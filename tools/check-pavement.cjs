@@ -30,7 +30,8 @@ const server=http.createServer((req,res)=>{
     for(let y=0;y<h;y++){same(0,y,w-1,y);same(w/2-1,y,w/2,y)}
     for(let x=0;x<w;x++){same(x,0,x,h-1);same(x,h/2-1,x,h/2)}
     for(let i=3;i<a.length;i+=4)if(a[i]!==255)throw Error('transparent tile hole');
-    tiles[name]={w,h,data:a};
+    if(material.tint){ctx.fillStyle=material.tint;ctx.fillRect(0,0,w,h)}
+    tiles[name]={w,h,data:ctx.getImageData(0,0,w,h).data};
    }
    const c=document.createElement('canvas');c.width=1400;c.height=960;const ctx=c.getContext('2d');drawPavement(ctx);const data=ctx.getImageData(0,0,1400,960).data;
    const inside=(x,y)=>{
