@@ -17,7 +17,7 @@
     <main class="game-shell">
       <canvas id="world" aria-label="Zona de prueba de KARLX WORLD. Usá WASD o las flechas para moverte." tabindex="0"></canvas>
       <section id="start" class="entry-overlay" aria-label="Entrada a KARLX WORLD">
-        <section id="boot" class="entry-screen boot-screen" aria-labelledby="boot-title">
+        <section id="boot" class="entry-screen boot-screen" hidden aria-labelledby="boot-title">
           <div class="boot-mark" aria-hidden="true">✦</div>
           <h2 id="boot-title" class="chrome-title brand-logo-slot" tabindex="-1"><span class="sr-only">KARLX WORLD</span><img class="brand-logo" src="/assets/brand/karlx-world-logo-original.png" alt="" width="1280" height="1280"></h2>
           <p class="system-caption">INICIANDO KARLX WORLD...</p>
@@ -26,7 +26,7 @@
           <button id="retry" class="entry-button" hidden>REINTENTAR</button>
           <span class="boot-footnote">ESTRATEGIA + CREATIVIDAD / SISTEMA PERSONAL</span>
         </section>
-        <section id="welcome" class="entry-screen" hidden aria-labelledby="welcome-title">
+        <section id="welcome" class="entry-screen" aria-labelledby="welcome-title">
           <div class="entry-window">
             <div class="window-titlebar"><span class="window-titlebar-title">KARLX WORLD · BIENVENIDA</span><span class="window-titlebar-tools" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6h8"/></svg><svg viewBox="0 0 12 12" focusable="false"><path d="M4 4V2h6v6H8"/><rect x="2" y="4" width="6" height="6"/></svg><svg viewBox="0 0 12 12" focusable="false"><path d="m2.5 2.5 7 7m0-7-7 7"/></svg></span></div>
             <div class="welcome-body">

@@ -9,7 +9,9 @@ const canvas = get('world');
 const hud = get('hud');
 const screens = ['boot', 'welcome', 'player-card', 'connection'];
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
-let phase = 'boot';
+let phase = 'welcome';
+// Observe resource failures immediately, while the visitor can use the welcome.
+const prepared = game.ready.then(() => true, () => false);
 let generation = 0;
 let toastTimer;
 let tipTimer;
@@ -79,9 +81,10 @@ document.addEventListener('keydown', event => audio.unlock(event), { capture: tr
 document.addEventListener('click', () => audio.play('click'));
 document.addEventListener('visibilitychange', () => { if (document.hidden) audio.pauseAll(); });
 
-async function boot() {
-  screen('boot');
-  const loading = get('boot');
+async function boot(run) {
+  screen('boot', 'boot-title');
+  get('retry').hidden = true;
+  get('boot-message').textContent = 'Cargando creatividad...';
   let cancelMinimum;
   // Start the minimum after the existing screen has had a chance to paint.
   const minimum = new Promise(resolve => {
@@ -118,37 +121,20 @@ async function boot() {
     get('boot-message').textContent = messages[index % messages.length];
   }, 450);
   try {
-    await Promise.all([game.ready, minimum]);
-    clearInterval(interval);
+    if (!await prepared) throw new Error('No se pudo preparar el playground.');
+    await minimum;
+    if (run !== generation) return false;
     progress.value = 100;
     get('boot-message').textContent = 'Todo listo ✓';
-    screen('welcome');
-    if (!motion.matches) {
-      // Keep the opaque loading over the already-rendered welcome during fade.
-      loading.hidden = false;
-      loading.inert = true;
-      loading.classList.add('boot-finishing');
-      get('welcome').inert = true;
-      const fade = loading.animate([{ opacity: 1 }, { opacity: 0 }],
-        { duration: 350, easing: 'ease-out', fill: 'forwards' });
-      const stopFade = () => { if (motion.matches) fade.finish(); };
-      motion.addEventListener('change', stopFade);
-      try { await fade.finished; } finally {
-        motion.removeEventListener('change', stopFade);
-        loading.hidden = true;
-        fade.cancel();
-        loading.classList.remove('boot-finishing');
-        loading.inert = false;
-        get('welcome').inert = false;
-      }
-    }
-    get('enter').focus({ preventScroll: true });
+    return true;
   } catch {
-    clearInterval(interval);
+    if (run !== generation) return false;
     get('boot-message').textContent = 'No se pudo cargar a KARLX. Recargá la página para volver a intentarlo.';
     get('retry').hidden = false;
     get('retry').focus();
+    return false;
   } finally {
+    clearInterval(interval);
     cancelMinimum();
   }
 }
@@ -164,18 +150,7 @@ get('launch').addEventListener('click', () => launch());
 async function launch() {
   if (phase !== 'player-card') return;
   const run = ++generation;
-  screen('connection', 'connection-title');
-  get('connection-log').replaceChildren();
-  const messages = ['Iniciando KARLX...', 'Conectando con el servidor creativo...', 'Cargando datos del portfolio...', 'Abriendo KARLX WORLD...', '✓ CONEXIÓN ESTABLECIDA'];
-  for (const message of messages) {
-    if (run !== generation) return;
-    const line = document.createElement('li');
-    line.textContent = message;
-    get('connection-log').append(line);
-    if (!motion.matches) await wait(240);
-  }
-  get('connection-status').textContent = 'Conexión establecida. KARLX WORLD está listo.';
-  if (run !== generation) return;
+  if (!await boot(run) || run !== generation) return;
   game.reveal();
   const arrival = get('world-arrival');
   arrival.classList.remove('fading');
@@ -271,4 +246,4 @@ document.addEventListener('keydown', event => {
     event.preventDefault(); first.focus();
   }
 });
-boot();
+screen('welcome');
