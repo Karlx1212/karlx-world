@@ -74,3 +74,9 @@
   .keyboard-movement-hint{display:none}
   .touch-movement-hint{display:inline}
 }
+
+/* Relocate only the outfit description into the existing identification gap. */
+.player-details{min-height:546px}
+.player-identification{position:relative}
+.player-identification .outfit-description{position:absolute;top:100%;left:0;right:0;margin:14px 0 0;font-size:13px;line-height:1.6}
+@media(max-width:800px){.player-details{min-height:0}.player-identification .outfit-description{position:static;margin-top:16px}}

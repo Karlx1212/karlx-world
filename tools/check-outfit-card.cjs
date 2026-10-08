@@ -28,19 +28,20 @@ const server = http.createServer((req,res) => {
    const layout=await page.evaluate(()=>{
     const card=document.querySelector('.player-portrait'),preview=document.querySelector('.outfit-preview'),label=document.getElementById('outfit-label'),details=document.querySelector('.outfit-card-details');
     const rect=el=>{const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom,width:r.width}};
-    return {card:rect(card),preview:rect(preview),label:rect(label),details:rect(details),right:rect(document.querySelector('.player-details')),button:rect(document.getElementById('launch')),panelOverflow:document.getElementById('player-card').scrollWidth>document.getElementById('player-card').clientWidth,inside:['outfit-class','outfit-ability','outfit-description'].every(id=>card.contains(document.getElementById(id))),overflow:card.scrollWidth>card.clientWidth,className:document.getElementById('outfit-class').textContent,description:document.getElementById('outfit-description').textContent};
+    return {card:rect(card),preview:rect(preview),label:rect(label),details:rect(details),right:rect(document.querySelector('.player-details')),button:rect(document.getElementById('launch')),panelOverflow:document.getElementById('player-card').scrollWidth>document.getElementById('player-card').clientWidth,inside:['outfit-class','outfit-ability'].every(id=>card.contains(document.getElementById(id))),overflow:card.scrollWidth>card.clientWidth,className:document.getElementById('outfit-class').textContent,description:document.getElementById('outfit-description').textContent,descriptionRight:document.querySelector('.player-details').contains(document.getElementById('outfit-description')),descriptionCount:document.querySelectorAll('#outfit-description').length,descriptionRect:rect(document.getElementById('outfit-description')),profile:rect(document.querySelector('.player-profile'))};
    });
    assert.equal(layout.panelOverflow,false);
-   if(!mobile)assert.ok(Math.abs(layout.button.bottom-layout.card.bottom)<1,'action aligns with card bottom');
+   if(!mobile)assert.ok(layout.button.bottom>=layout.card.bottom,'action remains at bottom of right column');
+   assert.equal(layout.descriptionRight,true);assert.equal(layout.descriptionCount,1);assert.ok(layout.descriptionRect.bottom<=layout.profile.top,'description does not overlap profile');
    assert.equal(layout.inside,true);assert.equal(layout.overflow,false);assert.ok(layout.label.bottom<=layout.preview.top);assert.ok(layout.details.top>=layout.preview.bottom);assert.ok(layout.details.bottom<=layout.card.bottom);assert.equal(layout.className,classes[i][0]);assert.ok(layout.card.bottom-layout.card.top>320);
    if(process.argv[4]) {
     if(mobile) {
      await page.locator('#outfit-label').scrollIntoViewIfNeeded();
-     await page.screenshot({path:path.join(process.argv[4],`identification-${i+1}-mobile.png`)});
+     await page.screenshot({path:path.join(process.argv[4],`description-right-${i+1}-mobile.png`)});
      await page.locator('#launch').scrollIntoViewIfNeeded();
      assert.equal(await page.locator('#launch').isVisible(),true);
-     await page.screenshot({path:path.join(process.argv[4],`identification-${i+1}-mobile-action.png`)});
-    } else await page.locator('.player-window').screenshot({path:path.join(process.argv[4],`identification-${i+1}-desktop.png`)});
+     await page.screenshot({path:path.join(process.argv[4],`description-right-${i+1}-mobile-action.png`)});
+    } else await page.locator('.player-window').screenshot({path:path.join(process.argv[4],`description-right-${i+1}-desktop.png`)});
    }
    console.log('PASS card',mobile?'mobile':'desktop',i+1,layout.card);
   }await context.close();
