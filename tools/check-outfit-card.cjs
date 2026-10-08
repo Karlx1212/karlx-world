@@ -5,8 +5,8 @@ const http = require('node:http');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const classes = [
-  ['CONTENT CREATOR','MODO VIRAL'], ['COMMUNITY MANAGER','PULSO COMUNITARIO'],
-  ['PRODUCCIÓN AUDIOVISUAL','VISIÓN NARRATIVA'], ['DISEÑADORA GRÁFICA','PÍXEL PERFECTO'],
+  ['CONTENT CREATOR','MODO VIRAL'], ['COMMUNITY MANAGER','CONEXIÓN ESTRATÉGICA'],
+  ['PRODUCTORA AUDIOVISUAL','VISIÓN NARRATIVA'], ['DISEÑADORA GRÁFICA','PÍXEL PERFECTO'],
 ];
 const root = path.resolve(__dirname, '../public');
 const server = http.createServer((req,res) => {
@@ -20,7 +20,7 @@ const server = http.createServer((req,res) => {
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({headless:true,executablePath:process.argv[3]});
  try{for(const mobile of process.argv[5] === 'mobile' ? [true] : [false,true]){
-  const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile});const page=await context.newPage();
+  const context=await browser.newContext({viewport:mobile?{width:375,height:812}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile});const page=await context.newPage();
   await page.goto(`http://127.0.0.1:${server.address().port}`,{waitUntil:'networkidle'});await page.locator('#enter').click();
   for(let i=0;i<4;i++){
    if(i)await page.locator('#outfit-next').click();await page.locator('#outfit-portrait').evaluate(img=>img.decode());
@@ -34,6 +34,7 @@ const server = http.createServer((req,res) => {
    if(!mobile)assert.ok(Math.abs(layout.card.bottom-layout.button.bottom-12)<1,'desktop button is 12px above card bottom');
    assert.equal(layout.descriptionRight,true);assert.equal(layout.descriptionCount,1);assert.ok(layout.descriptionRect.bottom<=layout.profile.top,'description does not overlap profile');
    assert.equal(layout.inside,true);assert.equal(layout.overflow,false);assert.ok(layout.label.bottom<=layout.preview.top);assert.ok(layout.details.top>=layout.preview.bottom);assert.ok(layout.details.bottom<=layout.card.bottom);assert.equal(layout.className,classes[i][0]);assert.equal(layout.ability,classes[i][1]);assert.ok(layout.card.bottom-layout.card.top>320);
+   if(i===1)assert.equal(layout.description,'Conecta marcas con sus comunidades mediante comunicación estratégica, conversaciones auténticas y relaciones duraderas');
    if(i===2)assert.equal(layout.description,'Transforma ideas en producciones audiovisuales impactantes mediante la edición, el ritmo y la narrativa visual.');
    if(process.argv[4]) {
     if(mobile) {

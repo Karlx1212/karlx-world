@@ -5,8 +5,8 @@ const http = require('node:http');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const classes = [
-  ['CONTENT CREATOR','MODO VIRAL'], ['COMMUNITY MANAGER','PULSO COMUNITARIO'],
-  ['PRODUCCIÓN AUDIOVISUAL','VISIÓN NARRATIVA'], ['DISEÑADORA GRÁFICA','PÍXEL PERFECTO'],
+  ['CONTENT CREATOR','MODO VIRAL'], ['COMMUNITY MANAGER','CONEXIÓN ESTRATÉGICA'],
+  ['PRODUCTORA AUDIOVISUAL','VISIÓN NARRATIVA'], ['DISEÑADORA GRÁFICA','PÍXEL PERFECTO'],
 ];
 const root = path.resolve(__dirname, '../public');
 const server = http.createServer((req,res) => {
