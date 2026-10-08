@@ -12,11 +12,17 @@ se utiliza 01 y el selector sigue funcionando.
 
 ## Apariencia jugable pendiente
 
-Los cuatro outfits siguen dibujándose con `/assets/characters/karlx/idle-front.png`,
-con las dimensiones actuales de 52 × 122. `game.playerAppearance` informa la
-identidad, el recurso realmente utilizado y `usesFallback: true`. No existe todavía
-un cambio visual de vestuario en el mundo. Los PNG del selector no se utilizan en
-el canvas y las hojas antiguas no se cargan.
+Reposo, otras direcciones y outfits siguen usando `/assets/characters/karlx/idle-front.png`,
+con las dimensiones actuales de 52 × 122. Hay una prueba reversible para Outfit 01
+caminando hacia abajo: `front-walk-preview.js` carga una hoja de 896 × 256 con siete
+celdas de 128 × 256, poses 1–6 y 8, a 100 ms por frame. No se usa la pose 7 recortada.
+Los frames son copias exactas de la revisión externa, sin nuevos ajustes anatómicos.
+El anclaje (64, 250) se coloca sobre la posición del jugador, sin oscilación adicional.
+La escala común 122/224 conserva la altura de referencia de 122 unidades del mundo.
+Las diferencias de proporciones y la discontinuidad por omitir la pose 7 permanecen
+como limitaciones de esta prueba. Con movimiento reducido o fallo de carga se utiliza
+el recurso temporal. `game.playerAppearance` informa el recurso realmente dibujado.
+Los PNG del selector y las hojas antiguas no se utilizan en el canvas.
 
 Cada entrada de `public/js/outfits.js` tiene `animation: null`, reservado para el
 manifiesto validado de animaciones. Para completar la etapa visual hacen falta

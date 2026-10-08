@@ -1,4 +1,5 @@
 import { playerState } from './player-state.js';
+import { getFrontWalkPreview } from './front-walk-preview.js';
 
 const canvas = document.querySelector('#world');
 const ctx = canvas.getContext('2d');
@@ -95,7 +96,21 @@ function bench(x,y){ellipse(x+75,y+15,88,14,'#6b737030');for(let i=0;i<3;i++)rec
 function lamp(x,y,time){ellipse(x,y,18,7,'#526e7140');rect(x-3,y-110,6,110,'#666880');rect(x-10,y-3,20,6,'#666880');poly([[x-14,y-116],[x,y-127],[x+14,y-116]],'#707088');rect(x-10,y-115,20,24,'#e9dfa9');line(x,y-116,x,y-91,'#666880',2);if(!reducedMotion){ctx.globalAlpha=.1+.04*Math.sin(time*.002);ellipse(x,y-105,30,29,'#fff5bc');ctx.globalAlpha=1;}}
 function sign(x,y){rect(x-3,y-90,6,90,'#8d869a');rect(x-62,y-101,124,44,'#f5eddc');rect(x-65,y-105,130,4,'#9586ad');text('BARRIO CREATIVO',x,y-83,9);text('FUND. ~2000',x,y-68,8,'#9d829a');}
 function planter(x,y){ellipse(x,y+4,24,8,'#62756e45');poly([[x-20,y-24],[x+20,y-24],[x+15,y+3],[x-15,y+3]],'#b49fac');ellipse(x,y-24,21,6,'#ddc3cc');for(let i=0;i<6;i++){line(x,y-24,x+(i-3)*6,y-48-(i%2)*13,'#647f76',3);ellipse(x+(i-3)*6,y-48-(i%2)*13,7,13,i%2?'#8caa91':'#aaba8c');}}
-function drawPlayer(){ellipse(player.x,player.y+3,23,8,'#3e45674a');const bounce=player.moving&&!reducedMotion?Math.sin(walkTime*17)*2:0;ctx.imageSmoothingEnabled=true;ctx.drawImage(sprite,player.x-character.width/2,player.y-character.height+bounce,character.width,character.height);}
+function drawPlayer(){
+  ellipse(player.x,player.y+3,23,8,'#3e45674a');
+  const preview = getFrontWalkPreview(player, walkTime, reducedMotion);
+  if (preview) {
+    const { image, manifest: m, frame } = preview;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(image, frame*m.frameWidth, 0, m.frameWidth, m.frameHeight,
+      player.x-m.anchorX*m.scale, player.y-m.anchorY*m.scale,
+      m.frameWidth*m.scale, m.frameHeight*m.scale);
+    return;
+  }
+  const bounce=player.moving&&!reducedMotion?Math.sin(walkTime*17)*2:0;
+  ctx.imageSmoothingEnabled=true;
+  ctx.drawImage(sprite,player.x-character.width/2,player.y-character.height+bounce,character.width,character.height);
+}
 function blocked(x,y){if(x<42||x>1358||y<330||y>915)return true;return obstacles.some(o=>x+11>o.x&&x-11<o.x+o.w&&y+5>o.y&&y-5<o.y+o.h);}
 function update(dt){if(!active){player.moving=false;return;}let dx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'));let dy=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));const len=Math.hypot(dx,dy);const before={x:player.x,y:player.y};if(len){dx=dx/len*player.speed*dt;dy=dy/len*player.speed*dt;if(!blocked(player.x+dx,player.y))player.x+=dx;if(!blocked(player.x,player.y+dy))player.y+=dy;player.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');}player.moving=before.x!==player.x||before.y!==player.y;if(player.moving)walkTime+=dt;else walkTime=0;}
 function render(time){const dpr=canvas.width/view.width;ctx.setTransform(dpr,0,0,dpr,0,0);rect(0,0,view.width,view.height,'#a5c2aa');const visibleW=view.width/view.scale,visibleH=view.height/view.scale;view.x=Math.max(0,Math.min(WORLD.width-visibleW,player.x-visibleW/2));view.y=Math.max(0,Math.min(WORLD.height-visibleH,player.y-visibleH*.66));ctx.translate(-view.x*view.scale,-view.y*view.scale);ctx.scale(view.scale,view.scale);floor(time);
@@ -153,10 +168,11 @@ sprite.onload=()=>{ready=true;resolveReady();};
 sprite.onerror=()=>{const error=document.querySelector('#error');error.hidden=false;error.textContent='No se pudo cargar a KARLX. Recargá la página para volver a intentarlo.';rejectReady(new Error('No se pudo cargar a KARLX.'));};
 export const game = {
   get playerOutfit() { return player.outfit; },
-  // Animation manifests remain null until validated directional sprites exist.
-  // No outfit preview or unvalidated legacy sheet is loaded by the renderer.
+  // Report the actual resource: only Outfit 01 has a provisional front walk.
   get playerAppearance() {
-    return { outfit: player.outfit, animation: playerState.outfit.animation, spriteSource: character.src, usesFallback: true };
+    const preview = getFrontWalkPreview(player, walkTime, reducedMotion);
+    return { outfit: player.outfit, animation: preview?.manifest ?? null,
+      spriteSource: preview?.manifest.src ?? character.src, usesFallback: !preview };
   },
   ready: assetsReady,
   events: gameEvents,
