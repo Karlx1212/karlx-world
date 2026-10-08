@@ -5,8 +5,8 @@ const http = require('node:http');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const classes = [
-  ['CONTENT CREATOR','VIRAL MODE'], ['COMMUNITY MANAGER','COMMUNITY PULSE'],
-  ['PRODUCCIÓN AUDIOVISUAL','VISIÓN NARRATIVA'], ['DISEÑADORA GRÁFICA','PIXEL PERFECT'],
+  ['CONTENT CREATOR','MODO VIRAL'], ['COMMUNITY MANAGER','PULSO COMUNITARIO'],
+  ['PRODUCCIÓN AUDIOVISUAL','VISIÓN NARRATIVA'], ['DISEÑADORA GRÁFICA','PÍXEL PERFECTO'],
 ];
 const root = path.resolve(__dirname, '../public');
 const server = http.createServer((req,res) => {
@@ -28,12 +28,12 @@ const server = http.createServer((req,res) => {
    const layout=await page.evaluate(()=>{
     const card=document.querySelector('.player-portrait'),preview=document.querySelector('.outfit-preview'),label=document.getElementById('outfit-label'),details=document.querySelector('.outfit-card-details');
     const rect=el=>{const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom,width:r.width}};
-    return {card:rect(card),preview:rect(preview),label:rect(label),details:rect(details),right:rect(document.querySelector('.player-details')),button:rect(document.getElementById('launch')),panelOverflow:document.getElementById('player-card').scrollWidth>document.getElementById('player-card').clientWidth,inside:['outfit-class','outfit-ability'].every(id=>card.contains(document.getElementById(id))),overflow:card.scrollWidth>card.clientWidth,className:document.getElementById('outfit-class').textContent,description:document.getElementById('outfit-description').textContent,descriptionRight:document.querySelector('.player-details').contains(document.getElementById('outfit-description')),descriptionCount:document.querySelectorAll('#outfit-description').length,descriptionRect:rect(document.getElementById('outfit-description')),profile:rect(document.querySelector('.player-profile'))};
+    return {card:rect(card),preview:rect(preview),label:rect(label),details:rect(details),right:rect(document.querySelector('.player-details')),button:rect(document.getElementById('launch')),panelOverflow:document.getElementById('player-card').scrollWidth>document.getElementById('player-card').clientWidth,inside:['outfit-class','outfit-ability'].every(id=>card.contains(document.getElementById(id))),overflow:card.scrollWidth>card.clientWidth,className:document.getElementById('outfit-class').textContent,ability:document.getElementById('outfit-ability').textContent,description:document.getElementById('outfit-description').textContent,descriptionRight:document.querySelector('.player-details').contains(document.getElementById('outfit-description')),descriptionCount:document.querySelectorAll('#outfit-description').length,descriptionRect:rect(document.getElementById('outfit-description')),profile:rect(document.querySelector('.player-profile'))};
    });
    assert.equal(layout.panelOverflow,false);
-   if(!mobile)assert.ok(layout.button.bottom>=layout.card.bottom,'action remains at bottom of right column');
+   if(!mobile)assert.ok(Math.abs(layout.card.bottom-layout.button.bottom-12)<1,'desktop button is 12px above card bottom');
    assert.equal(layout.descriptionRight,true);assert.equal(layout.descriptionCount,1);assert.ok(layout.descriptionRect.bottom<=layout.profile.top,'description does not overlap profile');
-   assert.equal(layout.inside,true);assert.equal(layout.overflow,false);assert.ok(layout.label.bottom<=layout.preview.top);assert.ok(layout.details.top>=layout.preview.bottom);assert.ok(layout.details.bottom<=layout.card.bottom);assert.equal(layout.className,classes[i][0]);assert.ok(layout.card.bottom-layout.card.top>320);
+   assert.equal(layout.inside,true);assert.equal(layout.overflow,false);assert.ok(layout.label.bottom<=layout.preview.top);assert.ok(layout.details.top>=layout.preview.bottom);assert.ok(layout.details.bottom<=layout.card.bottom);assert.equal(layout.className,classes[i][0]);assert.equal(layout.ability,classes[i][1]);assert.ok(layout.card.bottom-layout.card.top>320);
    if(i===2)assert.equal(layout.description,'Transforma ideas en producciones audiovisuales impactantes mediante la edición, el ritmo y la narrativa visual.');
    if(process.argv[4]) {
     if(mobile) {

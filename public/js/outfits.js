@@ -5,10 +5,10 @@
 const bounds = [[8,42,368,981],[8,42,371,980],[0,42,362,981],[0,42,360,971]];
 const widths = [368,371,362,408];
 const classes = [
-  { className: 'CONTENT CREATOR', ability: 'VIRAL MODE', description: 'Convierte ideas en contenido atractivo, detecta tendencias y conecta con nuevas audiencias.' },
-  { className: 'COMMUNITY MANAGER', ability: 'COMMUNITY PULSE', description: 'Construye comunidades, genera conversaciones y transforma seguidores en conexiones reales.' },
+  { className: 'CONTENT CREATOR', ability: 'MODO VIRAL', description: 'Convierte ideas en contenido atractivo, detecta tendencias y conecta con nuevas audiencias.' },
+  { className: 'COMMUNITY MANAGER', ability: 'PULSO COMUNITARIO', description: 'Construye comunidades, genera conversaciones y transforma seguidores en conexiones reales.' },
   { className: 'PRODUCCIÓN AUDIOVISUAL', ability: 'VISIÓN NARRATIVA', description: 'Transforma ideas en producciones audiovisuales impactantes mediante la edición, el ritmo y la narrativa visual.' },
-  { className: 'DISEÑADORA GRÁFICA', ability: 'PIXEL PERFECT', description: 'Convierte ideas en identidades visuales, composiciones y piezas gráficas memorables.' },
+  { className: 'DISEÑADORA GRÁFICA', ability: 'PÍXEL PERFECTO', description: 'Convierte ideas en identidades visuales, composiciones y piezas gráficas memorables.' },
 ];
 export const outfits = ['01', '02', '03', '04'].map((id, index) => ({
   id,

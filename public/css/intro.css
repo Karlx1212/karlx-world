@@ -78,5 +78,10 @@
 /* Relocate only the outfit description into the existing identification gap. */
 .player-details{min-height:546px}
 .player-identification{position:relative}
-.player-identification .outfit-description{position:absolute;top:100%;left:0;right:0;margin:14px 0 0;font-size:13px;line-height:1.6}
-@media(max-width:800px){.player-details{min-height:0}.player-identification .outfit-description{position:static;margin-top:16px}}
+.player-details dl .outfit-description{position:static;margin:0;padding:0;border:0;background:none;font-size:inherit;line-height:1.5;color:inherit}
+@media(min-width:801px){
+  .player-details{min-height:0;gap:18px}
+  .player-action #launch{position:relative;top:-12px}
+  .player-portrait{align-self:stretch}
+}
+@media(max-width:800px){.player-details{min-height:0}}
