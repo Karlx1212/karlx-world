@@ -6,7 +6,7 @@ const root=path.resolve(__dirname,'../public'),out=process.argv[4],before=proces
 fs.mkdirSync(out,{recursive:true});
 // Compare the real resize function with its previous formula across desktop,
 // portrait/landscape touch profiles and DPRs, independently of browser timing.
-if(before){
+{
  const vm=require('node:vm'),source=fs.readFileSync(path.join(root,'js/game.js'),'utf8');
  const resize=source.slice(source.indexOf('function resize()'),source.indexOf('new ResizeObserver'));
  const reference=source.match(/const FRAMING_REFERENCE = [^;]+;/)?.[0];

@@ -39,10 +39,11 @@ const server=http.createServer((req,res)=>{
    fs.writeFileSync(path.join(output,name+'.json'),JSON.stringify({before,frames},null,2));
    if(!baseline&&mobile&&process.argv[5])assert.ok(fs.readFileSync(path.join(output,name+'-canvas.png')).equals(fs.readFileSync(path.join(process.argv[5],name+'-canvas.png'))),'iPhone canvas unchanged');
    if(!baseline){
-    await page.evaluate(()=>{
+    await page.evaluate(async()=>{
+     const {cameraAxis}=await import('/js/world-camera.js');
      const t=window.__framing;
      const verify=(ok,msg)=>{if(!ok)throw Error(msg);};
-     const step=(key,dt)=>{t.clearInput();t.keys.add(key);t.update(dt);t.clearInput();t.render(1000);const v=t.view,w=v.width/v.scale,h=v.height/v.scale;verify(v.x===Math.max(0,Math.min(1400-w,t.player.x-w/2)),'horizontal follow');verify(v.y===Math.max(0,Math.min(960-h,t.player.y-h*.66)),'vertical follow');};
+     const step=(key,dt)=>{t.clearInput();t.keys.add(key);t.update(dt);t.clearInput();t.render(1000);const v=t.view,w=v.width/v.scale,h=v.height/v.scale;verify(v.x===cameraAxis(t.player.x,w,.5,-500,1900,1400),'horizontal follow');verify(v.y===cameraAxis(t.player.y,h,.66,-500,1460,960),'vertical follow');};
      for(const [key,inverse] of [['a','d'],['d','a'],['w','s'],['s','w']]){
       // Stay south of the approved fountain's wider platform while testing return.
       for(let n=0;n<2;n++)step(key,.05);

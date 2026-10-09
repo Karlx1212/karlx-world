@@ -279,3 +279,30 @@ carga fallida segura y capturas de llegada, árboles y canteros en escritorio
 1920×900 e iPhone X375×812 emulado. Las regresiones anteriores siguen
 cubriendo cuatro outfits, entrada, cámara, controles táctiles, circulación,
 fuente animada y movimiento reducido. Safari de iOS real no está disponible.
+
+## Etapa 8.3 — Exterior híbrido ampliado
+
+El mundo mide 2400 × 1960, con origen (-500,-500): X -500–1900, Y -500–1460. Las coordenadas existentes no se trasladaron. Los límites transitables son X -458–1858, Y -350–1418. El margen norte de 150 unidades permite conservar el sprite completo por encima de su anclaje de pies; no constituye una nueva colisión dentro del núcleo. Los límites antiguos dejan de bloquear la circulación.
+
+Plaza, fuente, aparición, 26 piezas de jardín, 16 obstáculos y cuatro caminos originales permanecen idénticos. `reservations.shop` solo documenta X 1160–1320/Y 690–830: no dibuja tienda, acceso ni interacción.
+
+Las prolongaciones independientes de `terrain.extensions` tienen ancho 120:
+
+| Dirección | X | Y | Referencia alcanzable |
+|---|---|---|---|
+| Norte | 640–760 | -260–270 | (700,-260) |
+| Sur | 640–760 | 915–1190 | (700,1190) |
+| Oeste | -200–42 | 500–620 | (-200,560) |
+| Este | 1358–1590 | 500–620 | (1590,560) |
+
+`garden.js` conserva el canvas original del núcleo (1400 × 960) y prepara 14 sectores exteriores de hasta 512 × 512. Todos muestrean C2 con fase mundial (0,0), incluso en coordenadas negativas. Los sectores fuera del viewport no se dibujan. No se añadió vegetación. Los píxeles de C2 no se filtraron ni recolorearon. El patrón conserva su periodicidad original de 512 unidades, más perceptible en una vista general reducida que durante el juego.
+
+`pavement.js` conserva `ground-C.png` intacto y prepara cuatro capas pequeñas para las prolongaciones, muestreando fragmentos rectos de ese mismo recurso a resolución nativa. Se alternan fragmentos reflejados para evitar saltos al repetir. Las capas nuevas se dibujan debajo del PNG original. Las hileras de remate de los antiguos extremos quedan como uniones transversales visibles: conservar exactamente los píxeles originales implica mantener esas hileras. Los extremos de destino permanecen rectangulares y provisionales; no se añadieron remates, señalizaciones o edificios.
+
+`game.js` mantiene FRAMING_REFERENCE 1400 × 960 y su fórmula responsive. `world-camera.js` calcula seguimiento directo, con clamp en los límites físicos ampliados. Una corrección constante de llegada reproduce el clamp original en viewports muy altos; en escritorio 1920 × 900 e iPhone X la corrección es cero. No hay interpolaciones por tiempo, estados acumulados ni cambios al cruzar los límites antiguos. La cámara ahora puede moverse dentro del antiguo núcleo al explorar: es necesario para seguir al personaje por el exterior y no afecta el encuadre inicial. No se implementó la relajación gradual inicialmente evaluada porque podía sacar al avatar de pantalla en móvil.
+
+Pruebas: check-exterior-world.cjs sirve las cuatro versiones históricas de módulos desde el commit 535cf0b para comparar el juego real antes/después; verifica datos protegidos, aparición, límites, escala inicial, cámara continua, visibilidad completa, ausencia de obstáculos nuevos, cuatro rutas con cuatro outfits, controles táctiles reales vía CDP y métricas de render. La vista general usa el render real a escala de diagnóstico en un canvas de prueba; no añade zoom al producto.
+
+check-exterior-pixels.py compara terreno y canvas inicial permitiendo diferencias exclusivamente en las nuevas prolongaciones. La prueba de pavimento verifica el PNG protegido, la opacidad de todas las prolongaciones y que los 2400 × 1960 píxeles de césped coincidan con un único patrón C2 anclado globalmente, detectando costuras o huecos de sector. Las regresiones de mapa, encuadre y escala se actualizaron para los límites actuales; se conservaron sus verificaciones de movimiento, outfits, colisiones y entrada.
+
+Memoria RGBA de terreno precalculado: ~17,94 MiB (núcleo más sectores; antes ~5,13 MiB), más ~0,64 MiB de prolongaciones. No incluye imágenes compartidas, patrones, buffers de GPU ni canvas de pantalla. Los sectores se preparan una vez; no se generan detalles por frame. Las métricas locales de JavaScript no certifican FPS ni rendimiento de Safari/iPhone físico.

@@ -35,9 +35,9 @@ const server = http.createServer((req,res)=>{
         return {id:m.id,dimensions:m.dimensions,spawn:m.spawn,bounds:m.walkableBounds,obstacles:m.obstacles,objects:m.objects.map(o=>({kind:o.kind,layer:o.layer})),paths:m.terrain.paths.map(p=>({id:p.id,points:p.points})),plaza:m.terrain.plaza};
       });
       assert.equal(definition.id,'central-plaza');
-      assert.deepEqual(definition.dimensions,{width:1400,height:960});
+      assert.deepEqual(definition.dimensions,{width:2400,height:1960});
       assert.deepEqual(definition.spawn,{x:700,y:640});
-      assert.deepEqual(definition.bounds,{minX:42,maxX:1358,minY:270,maxY:915});
+      assert.deepEqual(definition.bounds,{minX:-458,maxX:1858,minY:-350,maxY:1418});
       assert.equal(definition.obstacles.length,16);
       const fountainBands=definition.obstacles.slice(0,12);
       assert.equal(Math.min(...fountainBands.map(o=>o.y)),436);
@@ -87,7 +87,7 @@ const server = http.createServer((req,res)=>{
         // Basin from every side, followed by diagonal sliding along its south rim.
         for(const [x,y,key] of [[700,609,'w'],[700,431,'s'],[552,520,'d'],[848,520,'a']]){reset(x,y);step(key);verify(t.player.x===x&&t.player.y===y,'fountain collision');}
         reset(700,609);t.keys.add('w');t.keys.add('d');t.update(.05);verify(t.player.y===609&&t.player.x>700,'slide along fountain');
-        for(const [x,y,key] of [[42,640,'a'],[1358,640,'d'],[700,270,'w'],[700,915,'s']]){reset(x,y);step(key);verify(t.player.x===x&&t.player.y===y,'boundary');}
+        for(const [x,y,key] of [[-458,640,'a'],[1858,640,'d'],[700,-350,'w'],[700,1418,'s']]){reset(x,y);step(key);verify(t.player.x===x&&t.player.y===y,'boundary');}
         reset();t.keys.add('s');t.keys.add('d');t.update(.05);verify(Math.abs(Math.hypot(t.player.x-700,t.player.y-640)-10.5)<1e-8,'diagonal speed');
         // Dense scan ensures removed objects have no remaining invisible collisions.
         for(let y=270;y<=915;y+=5)for(let x=42;x<=1358;x+=5) {
@@ -104,7 +104,8 @@ const server = http.createServer((req,res)=>{
             verify(w<=1400+1e-8&&h<=960+1e-8,'mobile viewport stays inside world');
             verify(122*v.scale>=60,'mobile avatar is readable');
           } else verify(v.scale===Math.max(Math.min(v.width/1160,v.height/790),v.width/1400,v.height/960),'desktop viewport fits world');
-          verify(v.x===Math.max(0,Math.min(1400-w,x-w/2))&&v.y===Math.max(0,Math.min(960-h,y-h*.66)),'camera bounds');
+          const {cameraAxis}=await import('/js/world-camera.js');
+          verify(v.x===cameraAxis(x,w,.5,-500,1900,1400)&&v.y===cameraAxis(y,h,.66,-500,1460,960),'camera bounds');
         }
         reset();t.update(.05);return true;
       });

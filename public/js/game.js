@@ -1,4 +1,5 @@
 import { worldMap } from './world-map.js';
+import { cameraAxis } from './world-camera.js';
 import { fountainReady, drawFountainGround, fountainDepthObjects } from './magical-fountain.js';
 import { preparePavement, drawPavement } from './pavement.js';
 import { prepareGarden, drawGrass, drawGardenObject } from './garden.js';
@@ -65,8 +66,8 @@ function poly(points,color){ctx.fillStyle=color;ctx.beginPath();points.forEach((
 function text(value,x,y,size,color='#43435f',font='monospace'){ctx.fillStyle=color;ctx.font=`${size}px ${font}`;ctx.textAlign='center';ctx.fillText(value,x,y);}
 function floor(time){
   const t=worldMap.terrain;
-  rect(0,0,WORLD.width,WORLD.height,t.color);
-  drawGrass(ctx);
+  rect(worldMap.origin.x,worldMap.origin.y,WORLD.width,WORLD.height,t.color);
+  drawGrass(ctx, { x: view.x, y: view.y, w: view.width/view.scale, h: view.height/view.scale });
   drawPavement(ctx);
   for(const object of worldMap.objects.filter(o=>o.layer==='ground'))drawMapObject(object,time);
   for(const object of worldMap.objects.filter(o=>o.kind==='fountain'))drawFountainGround(ctx,object,time,reducedMotion);
@@ -143,7 +144,7 @@ function drawPlayer(){
 }
 function blocked(x,y){const b=worldMap.walkableBounds;if(x<b.minX||x>b.maxX||y<b.minY||y>b.maxY)return true;return obstacles.some(o=>x+11>o.x&&x-11<o.x+o.w&&y+5>o.y&&y-5<o.y+o.h);}
 function update(dt){if(!active){player.moving=false;return;}let dx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'));let dy=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));const len=Math.hypot(dx,dy);const before={x:player.x,y:player.y};if(len){dx=dx/len*player.speed*dt;dy=dy/len*player.speed*dt;if(!blocked(player.x+dx,player.y))player.x+=dx;if(!blocked(player.x,player.y+dy))player.y+=dy;player.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');}player.moving=before.x!==player.x||before.y!==player.y;if(player.moving)walkTime+=dt;else walkTime=0;}
-function render(time){const dpr=canvas.width/view.width;ctx.setTransform(dpr,0,0,dpr,0,0);rect(0,0,view.width,view.height,worldMap.ambient.background);const visibleW=view.width/view.scale,visibleH=view.height/view.scale;view.x=Math.max(0,Math.min(WORLD.width-visibleW,player.x-visibleW/2));view.y=Math.max(0,Math.min(WORLD.height-visibleH,player.y-visibleH*.66));ctx.translate(-view.x*view.scale,-view.y*view.scale);ctx.scale(view.scale,view.scale);floor(time);
+function render(time){const dpr=canvas.width/view.width;ctx.setTransform(dpr,0,0,dpr,0,0);rect(0,0,view.width,view.height,worldMap.ambient.background);const visibleW=view.width/view.scale,visibleH=view.height/view.scale;const c=worldMap.cameraCore,o=worldMap.origin;view.x=cameraAxis(player.x,visibleW,.5,o.x,o.x+WORLD.width,c.width);view.y=cameraAxis(player.y,visibleH,.66,o.y,o.y+WORLD.height,c.height);ctx.translate(-view.x*view.scale,-view.y*view.scale);ctx.scale(view.scale,view.scale);floor(time);
   const objects=worldMap.objects.filter(o=>o.layer!=='ground').flatMap(o=>o.kind==='fountain'?fountainDepthObjects(ctx,o,time,reducedMotion):[{y:o.depth,draw:()=>drawMapObject(o,time)}]);if(ready)objects.push({y:player.y,draw:drawPlayer});objects.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
   ctx.setTransform(dpr,0,0,dpr,0,0);const shade=ctx.createLinearGradient(0,0,0,view.height);for(const [offset,color] of worldMap.ambient.shade)shade.addColorStop(offset,color);ctx.fillStyle=shade;ctx.fillRect(0,0,view.width,view.height);
 }
