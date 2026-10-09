@@ -21,6 +21,10 @@ const server=http.createServer((req,res)=>{
    const {game}=await import('/js/game.js');await game.ready;
    const {worldMap:m}=await import('/js/world-map.js'),{worldMap:b}=await import('/js/__baseline-world.js');
    const current=JSON.parse(JSON.stringify(m)),previous=JSON.parse(JSON.stringify(b));
+   // Only the approved garden and grass are new; all earlier geometry stays.
+   current.objects=current.objects.filter(o=>o.kind!=='garden');
+   current.obstacles=current.obstacles.slice(0,12);
+   delete current.terrain.grass;delete previous.terrain.texture;
    for(const map of [current,previous])delete map.terrain.pavement;
    if(JSON.stringify(current)!==JSON.stringify(previous))throw Error('protected map data changed');
    const expected=[[550,325],[850,325],[1000,435],[1000,625],[850,735],[550,735],[400,625],[400,435]];

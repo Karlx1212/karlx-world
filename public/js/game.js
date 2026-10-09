@@ -1,6 +1,7 @@
 import { worldMap } from './world-map.js';
 import { fountainReady, drawFountainGround, fountainDepthObjects } from './magical-fountain.js';
 import { preparePavement, drawPavement } from './pavement.js';
+import { prepareGarden, drawGrass, drawGardenObject } from './garden.js';
 import { playerState } from './player-state.js';
 import { getFrontWalkPreview } from './front-walk-preview.js';
 import { getLeftWalk } from './left-walk.js';
@@ -33,6 +34,7 @@ let view = { width: 1, height: 1, scale: 1, x: 0, y: 0 };
 const gameEvents = new EventTarget();
 const obstacles = worldMap.obstacles;
 const pavementReady = preparePavement(worldMap);
+const gardenReady = prepareGarden(worldMap);
 function resize() {
   const box = canvas.getBoundingClientRect();
   const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -63,14 +65,14 @@ function text(value,x,y,size,color='#43435f',font='monospace'){ctx.fillStyle=col
 function floor(time){
   const t=worldMap.terrain;
   rect(0,0,WORLD.width,WORLD.height,t.color);
-  const texture=t.texture;
-  for(let i=0;i<texture.count;i++){let x=(i*texture.xStep)%WORLD.width,y=(i*texture.yStep)%WORLD.height;rect(x,y,texture.w,texture.h,texture.colors[i%3?1:0]);}
+  drawGrass(ctx);
   drawPavement(ctx);
   for(const object of worldMap.objects.filter(o=>o.layer==='ground'))drawMapObject(object,time);
   for(const object of worldMap.objects.filter(o=>o.kind==='fountain'))drawFountainGround(ctx,object,time,reducedMotion);
 }
 function drawMapObject(o,time){
-  if(o.kind==='building')building(o.x,o.y,o.w,o.h,o.type);
+  if(o.kind==='garden')drawGardenObject(ctx,o);
+  else if(o.kind==='building')building(o.x,o.y,o.w,o.h,o.type);
   else if(o.kind==='tree')tree(o.x,o.y,o.scale,time);
   else if(o.kind==='bench')bench(o.x,o.y);
   else if(o.kind==='lamp')lamp(o.x,o.y,time);
@@ -202,7 +204,7 @@ export const game = {
       spriteSource: preview?.manifest.src ?? (['outfit-01', 'outfit-02', 'outfit-03', 'outfit-04'].includes(player.outfit) ? null : character.src),
       usesFallback: !preview && !['outfit-01', 'outfit-02', 'outfit-03', 'outfit-04'].includes(player.outfit), pose: preview?.isIdle ? 'idle' : preview ? 'walk' : 'temporary' };
   },
-  ready: Promise.all([assetsReady, outfit01IdleReady, outfit02Ready, outfit03Ready, outfit04Ready, fountainReady, pavementReady]),
+  ready: Promise.all([assetsReady, outfit01IdleReady, outfit02Ready, outfit03Ready, outfit04Ready, fountainReady, pavementReady, gardenReady]),
   events: gameEvents,
   reveal() { hud.hidden=false; active=false; clearInput(); canvas.style.touchAction='auto'; },
   resume() { if(!ready)return; active=true; clearInput(); canvas.style.touchAction='none'; canvas.focus({preventScroll:true}); gameEvents.dispatchEvent(new Event('enter')); },

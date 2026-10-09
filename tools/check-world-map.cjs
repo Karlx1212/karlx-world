@@ -38,12 +38,15 @@ const server = http.createServer((req,res)=>{
       assert.deepEqual(definition.dimensions,{width:1400,height:960});
       assert.deepEqual(definition.spawn,{x:700,y:640});
       assert.deepEqual(definition.bounds,{minX:42,maxX:1358,minY:270,maxY:915});
-      assert.equal(definition.obstacles.length,12);
-      assert.equal(Math.min(...definition.obstacles.map(o=>o.y)),436);
-      assert.equal(Math.max(...definition.obstacles.map(o=>o.y+o.h)),604);
-      assert.equal(Math.min(...definition.obstacles.map(o=>o.x)),563);
-      assert.equal(Math.max(...definition.obstacles.map(o=>o.x+o.w)),837);
-      assert.deepEqual(definition.objects,[{kind:'fountain',layer:'layered'}]);
+      assert.equal(definition.obstacles.length,16);
+      const fountainBands=definition.obstacles.slice(0,12);
+      assert.equal(Math.min(...fountainBands.map(o=>o.y)),436);
+      assert.equal(Math.max(...fountainBands.map(o=>o.y+o.h)),604);
+      assert.equal(Math.min(...fountainBands.map(o=>o.x)),563);
+      assert.equal(Math.max(...fountainBands.map(o=>o.x+o.w)),837);
+      assert.deepEqual(definition.objects[0],{kind:'fountain',layer:'layered'});
+      assert.equal(definition.objects.filter(o=>o.kind==='garden'&&o.layer==='depth').length,2);
+      assert.equal(definition.objects.filter(o=>o.kind==='garden'&&o.layer==='ground').length,24);
       assert.deepEqual(definition.paths,[
         {id:'north',points:[[640,270],[760,270],[760,460],[640,460]]},
         {id:'south',points:[[640,580],[760,580],[760,915],[640,915]]},
@@ -56,7 +59,7 @@ const server = http.createServer((req,res)=>{
       assert.deepEqual([(Math.min(...xs)+Math.max(...xs))/2,(Math.min(...ys)+Math.max(...ys))/2],[700,530]);
       assert.deepEqual([436-Math.min(...ys),Math.max(...ys)-604,563-Math.min(...xs),Math.max(...xs)-837],[111,131,163,163]);
       const result=await page.evaluate(async()=>{
-        const t=window.__worldTest;const {selectOutfit}=await import('/js/player-state.js');const {game}=await import('/js/game.js');
+        const t=window.__worldTest;const {selectOutfit}=await import('/js/player-state.js');const {game}=await import('/js/game.js');const {worldMap:m}=await import('/js/world-map.js');
         const verify=(ok,message)=>{if(!ok)throw Error(message);};
         const reset=(x=700,y=640)=>{t.clearInput();t.player.x=x;t.player.y=y;t.player.facing='down';};
         const step=(key,dt=.05)=>{t.clearInput();t.keys.add(key);t.update(dt);t.clearInput();};
@@ -90,7 +93,10 @@ const server = http.createServer((req,res)=>{
         for(let y=270;y<=915;y+=5)for(let x=42;x<=1358;x+=5) {
           const radius=((x-700)/137)**2+((y-520)/84)**2;
           if(radius<1)verify(t.blocked(x,y),'walkable inside platform at '+x+','+y);
-          if(radius>1.6)verify(!t.blocked(x,y),'unexpected distant obstacle at '+x+','+y);
+          if(radius>1.6){
+            const gardenBlocked=m.obstacles.slice(12).some(o=>x+11>o.x&&x-11<o.x+o.w&&y+5>o.y&&y-5<o.y+o.h);
+            verify(t.blocked(x,y)===gardenBlocked,'unexpected distant obstacle at '+x+','+y);
+          }
         }
         for(const [x,y] of [[42,270],[700,640],[1358,915]]) {
           reset(x,y);t.render(1000);const v=t.view,w=v.width/v.scale,h=v.height/v.scale;

@@ -210,7 +210,7 @@ Las regresiones de mapa verifican los vértices, márgenes, recorridos completos
 hasta los cuatro extremos y el nuevo límite norte. Las pruebas de pavimento
 siguen verificando juntas, opacidad y encuentros con los materiales existentes.
 
-## Pavimento recuperado — etapa 6, pendiente de aprobación visual
+## Pavimento recuperado — etapa 6, aprobado
 
 La geometría C, los senderos y los límites transitables no cambian. El extremo
 norte sigue recto en Y=270; no se incorpora el remate achaflanado de revisión.
@@ -233,3 +233,49 @@ de las texturas de origen y cobertura opaca. La regresión de Canvas verifica
 identidad de la imagen dibujada, cobertura y conservación de todos los datos
 del mapa salvo los materiales frente a 43793ab. Los recursos anteriores se
 conservan; no se descarta trabajo ni se modifica la Fuente Mágica.
+
+## Jardín C + césped C2 — etapa 7, integrado sin commit
+
+Se conserva toda la geometría C, pavimento recuperado, fuente y sus doce
+bandas de colisión. `garden-data.js` guarda las 26 posiciones literales de
+la revisión aprobada C2: dos árboles, cuatro arbustos bajos, cuatro grupos
+de rosas, dos canteros, seis grupos lilas y ocho manchas florales pequeñas.
+Los árboles están en (210,455), alto165, y (1110,450), alto175; mantienen
+la proporción del PNG y su anclaje inferior. No se incluye el tercer árbol
+de la primera propuesta. Flores y arbustos bajos son transitables.
+
+Los árboles usan la profundidad Y existente, permitiendo pasar delante o
+detrás de las copas. Solo se bloquean troncos12×12 en (204,441)/(1104,436)
+y bases de canteros60×10 en (555,773)/(785,773). La huella de pies22×10,
+el deslizamiento y el algoritmo de colisiones no cambian. Los cuatro caminos
+y el paseo alrededor de la fuente permanecen libres.
+
+`garden.js` precarga los seis PNG de vegetación y `grass-C2.png`, copia
+binaria de la variante aprobada. Compone una superficie de césped1400×960
+una sola vez, repitiendo la muestra a512 unidades de mundo como la propuesta.
+No aplica filtros ni tintes. Un drawImage por frame dibuja el terreno, luego
+el pavimento original y la vegetación baja, después la fuente y las piezas
+con profundidad. `game.ready` espera todos los nuevos recursos y un fallo
+utiliza la pantalla de reintento existente; no se modifica intro.js.
+
+La superficie ocupa aproximadamente5,1MiB decodificada; no depende del DPR
+del móvil. No hay temporizadores nuevos, briznas procedurales por frame ni
+animaciones de vegetación. El ciclo del agua y movimiento reducido no cambian.
+Los PNG originales se preservan, sin reinterpretación ni modificación de
+las costuras del recurso. La muestra no tiene bordes matemáticamente idénticos;
+su variación al repetirla es comparable a la textura interna aprobada.
+
+Pruebas específicas:
+
+```text
+python tools/check-garden-assets.py APPROVED_GRASS_STAGE7_DIRECTORY
+node tools/check-garden.cjs PLAYWRIGHT_MODULE EDGE_EXECUTABLE OUTPUT_DIRECTORY
+```
+
+Verifican identidad de recursos y coordenadas, transparencia, continuidad
+estadística de la muestra, cuatro colisiones pequeñas desde todos los lados,
+ausencia de obstáculos por copas/flores, profundidad real del drawImage,
+carga fallida segura y capturas de llegada, árboles y canteros en escritorio
+1920×900 e iPhone X375×812 emulado. Las regresiones anteriores siguen
+cubriendo cuatro outfits, entrada, cámara, controles táctiles, circulación,
+fuente animada y movimiento reducido. Safari de iOS real no está disponible.

@@ -1,4 +1,5 @@
 import { fountainAssets } from './fountain-assets.js';
+import { gardenObjects, gardenObstacles } from './garden-data.js';
 // Surface art is independent of playable geometry and fountain depth pieces.
 const fountain = {
   kind: 'fountain', layer: 'layered', x: 700, y: 520,
@@ -20,15 +21,15 @@ export const worldMap = {
   dimensions: { width: 1400, height: 960 },
   spawn: { x: 700, y: 640 },
   walkableBounds: { minX: 42, maxX: 1358, minY: 270, maxY: 915 },
-  obstacles: fountainObstacles,
+  obstacles: [...fountainObstacles, ...gardenObstacles],
   // The platform is ground; each raised piece has its own projected depth.
-  objects: [fountain],
+  objects: [fountain, ...gardenObjects],
   terrain: {
     color: '#a5c2aa',
     pavement: {
       surface: { src: '/assets/world/pavement/recovered/ground-C.png' },
     },
-    texture: { count: 430, xStep: 137, yStep: 79, w: 3, h: 2, colors: ['#bdd0ad', '#96b69d'] },
+    grass: { src: '/assets/world/garden/grass-C2.png', tileSize: 512 },
     plaza: { x: 400, y: 325, w: 600, h: 410,
       points: [[550,325],[850,325],[1000,435],[1000,625],[850,735],[550,735],[400,625],[400,435]] },
     paths: [
