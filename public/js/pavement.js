@@ -1,93 +1,17 @@
-const images = new Map();
 let surface;
-function canvas(width, height) {
-  const c = document.createElement('canvas'); c.width = width; c.height = height;
-  return c;
-}
-function load(src) {
-  const image = new Image(); images.set(src, image);
+
+// The recovered materials are assembled once at native world resolution.
+// This ground-only layer keeps the approved map geometry and depth unchanged.
+export function preparePavement(worldMap) {
+  const image = new Image();
   return new Promise((resolve, reject) => {
-    image.onload = resolve;
+    image.onload = () => { surface = image; resolve(); };
     image.onerror = () => reject(new Error('No se pudo cargar el pavimento de la plaza.'));
-    image.src = src;
+    image.src = worldMap.terrain.pavement.surface.src;
   });
 }
-function pathShape(ctx, worldMap) {
-  ctx.beginPath();
-  for (const path of worldMap.terrain.paths) {
-    path.points.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
-    ctx.closePath();
-  }
-}
-function plazaShape(ctx, worldMap) {
-  ctx.beginPath();
-  worldMap.terrain.plaza.points.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
-  ctx.closePath();
-}
-function materialTile(material) {
-  const image = images.get(material.src);
-  const tile = canvas(image.naturalWidth, image.naturalHeight);
-  const ctx = tile.getContext('2d');
-  ctx.drawImage(image, 0, 0);
-  // Color grades retain the original pixel clusters and repeat boundaries.
-  if (material.tint) {
-    ctx.fillStyle = material.tint;
-    ctx.fillRect(0, 0, tile.width, tile.height);
-  }
-  return tile;
-}
-function build(worldMap) {
-  const material = worldMap.terrain.pavement;
-  const { width, height } = worldMap.dimensions;
-  surface = canvas(width,height);const ctx = surface.getContext('2d');
-  const rose = materialTile(material.plaza);
-  const cream = materialTile(material.paths);
-  const p = worldMap.terrain.plaza;
-
-  ctx.save();pathShape(ctx,worldMap);ctx.clip();ctx.fillStyle=ctx.createPattern(cream,'repeat');ctx.fillRect(0,0,width,height);ctx.restore();
-  ctx.save();plazaShape(ctx,worldMap);ctx.clip();ctx.fillStyle=ctx.createPattern(rose,'repeat');ctx.fillRect(p.x,p.y,p.w,p.h);ctx.restore();
-
-  // Rasterize the union once, then find its inside border. Internal overlaps
-  // (roads entering the octagon) never become decorative dividing lines.
-  const mask = canvas(width,height), mctx = mask.getContext('2d');
-  pathShape(mctx,worldMap);mctx.fillStyle='#fff';mctx.fill();
-  plazaShape(mctx,worldMap);mctx.fill();
-  const pixels = mctx.getImageData(0,0,width,height).data;
-  const border = canvas(width,height), bctx = border.getContext('2d');
-  const edge = bctx.createImageData(width,height), r = material.borderWidth;
-  const neighbors = [[r,0],[-r,0],[0,r],[0,-r],[r-2,r-2],[r-2,2-r],[2-r,r-2],[2-r,2-r]];
-  for (let y=0;y<height;y++) for(let x=0;x<width;x++) {
-    const i=(y*width+x)*4;if(!pixels[i+3])continue;
-    if(neighbors.some(([dx,dy]) => x+dx<0||x+dx>=width||y+dy<0||y+dy>=height||pixels[((y+dy)*width+x+dx)*4+3]<128)) {
-      edge.data[i]=255;edge.data[i+1]=255;edge.data[i+2]=255;edge.data[i+3]=pixels[i+3];
-    }
-  }
-  bctx.putImageData(edge,0,0);
-  const trim=canvas(width,height), tctx=trim.getContext('2d');
-  const curb=materialTile(material.curb);
-  tctx.imageSmoothingEnabled=false;
-  // Orient reusable stone sprites along each side, including the chamfers.
-  // The union mask removes stamps at the four open entrances.
-  for(const polygon of [p.points,...worldMap.terrain.paths.map(path=>path.points)]) {
-    polygon.forEach(([x,y],i)=>{
-      const [xx,yy]=polygon[(i+1)%polygon.length],length=Math.hypot(xx-x,yy-y);
-      tctx.save();tctx.translate(x,y);tctx.rotate(Math.atan2(yy-y,xx-x));
-      for(let d=0,index=0;d<length;d+=32,index++) {
-        const segment=Math.min(32,length-d);
-        tctx.drawImage(curb,(index%4)*32,0,segment,22,d,0,segment,r*1.5);
-      }
-      tctx.restore();
-    });
-  }
-  tctx.globalCompositeOperation='destination-in';tctx.drawImage(border,0,0);
-  ctx.drawImage(trim,0,0);
-  ctx.imageSmoothingEnabled=false;
-}
-export function preparePavement(worldMap) {
-  const material = worldMap.terrain.pavement;
-  return Promise.all([material.plaza.src,material.paths.src,material.curb.src].map(load)).then(() => build(worldMap));
-}
 export function drawPavement(ctx) {
-  if(!surface)return;
-  ctx.imageSmoothingEnabled=false;ctx.drawImage(surface,0,0);
+  if (!surface) return;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(surface, 0, 0);
 }

@@ -26,10 +26,7 @@ export const worldMap = {
   terrain: {
     color: '#a5c2aa',
     pavement: {
-      plaza: { src: '/assets/world/pavement/octagonal-pink.png', tint: '#fff1e91a' },
-      paths: { src: '/assets/world/pavement/octagonal-cream.png' },
-      curb: { src: '/assets/world/pavement/octagonal-curb.png' },
-      borderWidth: 16,
+      surface: { src: '/assets/world/pavement/recovered/ground-C.png' },
     },
     texture: { count: 430, xStep: 137, yStep: 79, w: 3, h: 2, colors: ['#bdd0ad', '#96b69d'] },
     plaza: { x: 400, y: 325, w: 600, h: 410,

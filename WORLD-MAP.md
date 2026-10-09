@@ -209,3 +209,27 @@ No se cambian materiales, recursos, cámara, motor ni controles.
 Las regresiones de mapa verifican los vértices, márgenes, recorridos completos
 hasta los cuatro extremos y el nuevo límite norte. Las pruebas de pavimento
 siguen verificando juntas, opacidad y encuentros con los materiales existentes.
+
+## Pavimento recuperado — etapa 6, pendiente de aprobación visual
+
+La geometría C, los senderos y los límites transitables no cambian. El extremo
+norte sigue recto en Y=270; no se incorpora el remate achaflanado de revisión.
+`terrain.pavement.surface` referencia `recovered/ground-C.png`, composición de
+suelo 1400 × 960 preparada con el ZIP `plaza-original-TILESET-PARA-APROBACION.zip`.
+`pavement.js` espera su carga y la dibuja a resolución de mundo, debajo de fuente
+y avatar. No recompone figuras ni aplica tintes durante el render.
+
+La escala común es 1,32 píxeles fuente por unidad de mundo. Las diagonales y
+bordes usan los píxeles literales de las piezas del ZIP, con recortes y fragmentos
+interiores para prolongarlas. Las superficies rosa y crema usan las texturas
+reconstruidas documentadas del paquete. Las uniones no son recortes literales
+completos: sus anchuras originales son diferentes y se ensamblan con esos mismos
+materiales. No se estiran piezas ni se añaden colores. La procedencia y las
+limitaciones están en `recovered/LEEME.md` y `provenance.json`.
+
+`tools/prepare-recovered-pavement.py` reproduce el ensamblado desde el ZIP.
+`tools/check-recovered-pavement.py` comprueba su hash, procedencia RGB, continuidad
+de las texturas de origen y cobertura opaca. La regresión de Canvas verifica
+identidad de la imagen dibujada, cobertura y conservación de todos los datos
+del mapa salvo los materiales frente a 43793ab. Los recursos anteriores se
+conservan; no se descarta trabajo ni se modifica la Fuente Mágica.

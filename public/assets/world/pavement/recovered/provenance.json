@@ -1,0 +1,121 @@
+{
+  "archive": "plaza-original-TILESET-PARA-APROBACION.zip",
+  "archiveSha256": "10148f59decf7c60742961fc4c71db0fa2aec69ba30f22de5cf7355ace550388",
+  "sourcePixelsPerWorldUnit": 1.32,
+  "dimensions": [
+    1400,
+    960
+  ],
+  "plaza": [
+    [
+      550,
+      325
+    ],
+    [
+      850,
+      325
+    ],
+    [
+      1000,
+      435
+    ],
+    [
+      1000,
+      625
+    ],
+    [
+      850,
+      735
+    ],
+    [
+      550,
+      735
+    ],
+    [
+      400,
+      625
+    ],
+    [
+      400,
+      435
+    ]
+  ],
+  "paths": [
+    [
+      [
+        640,
+        270
+      ],
+      [
+        760,
+        270
+      ],
+      [
+        760,
+        460
+      ],
+      [
+        640,
+        460
+      ]
+    ],
+    [
+      [
+        640,
+        580
+      ],
+      [
+        760,
+        580
+      ],
+      [
+        760,
+        915
+      ],
+      [
+        640,
+        915
+      ]
+    ],
+    [
+      [
+        42,
+        500
+      ],
+      [
+        580,
+        500
+      ],
+      [
+        580,
+        620
+      ],
+      [
+        42,
+        620
+      ]
+    ],
+    [
+      [
+        820,
+        500
+      ],
+      [
+        1358,
+        500
+      ],
+      [
+        1358,
+        620
+      ],
+      [
+        820,
+        620
+      ]
+    ]
+  ],
+  "literalBorderPixels": 76605,
+  "reconstructedSurfacePixels": 264451,
+  "method": "Original quilted surfaces; exclusive strips sampled from literal transparent pieces with one shared isotropic scale; lengths filled by repeating fragments. No new colors, no independent piece stretching.",
+  "limitations": "Reference joints have direction-dependent widths. Junction surfaces are reconstructed from existing quilted materials; literal corner and curb pixels retain source RGB."
+}
