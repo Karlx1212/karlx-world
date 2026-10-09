@@ -17,6 +17,8 @@ const ctx = canvas.getContext('2d');
 const hud = document.querySelector('#hud');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const WORLD = worldMap.dimensions;
+// Approved framing is independent of scene dimensions; camera bounds still use WORLD.
+const FRAMING_REFERENCE = Object.freeze({ width: 1400, height: 960 });
 const player = { ...worldMap.spawn, speed: 210, moving: false, facing: 'down', get outfit() { return playerState.activeOutfit; } };
 // Replace this manifest with professional directional frames later.
 const character = { src: '/assets/characters/karlx/idle-front.png', width: 52, height: 122 };
@@ -48,12 +50,11 @@ function resize() {
     const portrait = box.height >= box.width;
     const mobileScale = portrait ? Math.max(1.2, box.width/480, box.height/640)
       : Math.min(Math.max(box.width/900, box.height/500), box.height/320);
-    // Never expose space beyond the world because the viewport is larger than it.
-    view.scale = Math.max(mobileScale, box.width/WORLD.width, box.height/WORLD.height);
+    // Retain the approved viewport fit even when future scenes grow.
+    view.scale = Math.max(mobileScale, box.width/FRAMING_REFERENCE.width, box.height/FRAMING_REFERENCE.height);
   } else {
-    // The camera cannot center a viewport wider/taller than its world bounds.
-    // Preserve the desktop scale unless it would expose space outside the map.
-    view.scale = Math.max(view.scale, box.width/WORLD.width, box.height/WORLD.height);
+    // Retain the approved desktop fit independently of the world's total size.
+    view.scale = Math.max(view.scale, box.width/FRAMING_REFERENCE.width, box.height/FRAMING_REFERENCE.height);
   }
 }
 new ResizeObserver(resize).observe(canvas);

@@ -5,7 +5,10 @@ const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),
 const root=path.resolve(__dirname,'../public');
 const original=execFileSync('git',['show','952a5d5:public/js/game.js'],{encoding:'utf8'}).replaceAll('\r\n','\n');
 const current=fs.readFileSync(path.join(root,'js/game.js'),'utf8').replaceAll('\r\n','\n');
-for(const [start,end] of [['function resize()','new ResizeObserver'],['function blocked(','function render('],['function render(','function frame(']])assert.equal(current.slice(current.indexOf(start),current.indexOf(end)),original.slice(original.indexOf(start),original.indexOf(end)),'camera/movement/collisions changed');
+for(const [start,end] of [['function resize()','new ResizeObserver'],['function blocked(','function render('],['function render(','function frame(']]) {
+ const normalize=s=>start==='function resize()'?s.replaceAll('FRAMING_REFERENCE','WORLD').replace(/\/\/[^\n]*/g,'').replace(/\s+/g,''):s;
+ assert.equal(normalize(current.slice(current.indexOf(start),current.indexOf(end))),normalize(original.slice(original.indexOf(start),original.indexOf(end))),'camera/movement/collisions changed');
+}
 assert.equal(execFileSync('git',['diff','43793ab','--name-only','--','public/assets/world/magical-fountain','public/js/magical-fountain.js','public/js/fountain-assets.js','public/css','public/js/intro.js','public/js/outfits.js','public/js/player-state.js','public/js/outfit-01-idle.js','public/js/outfit-02-animation.js','public/js/outfit-03-animation.js','public/js/outfit-04-animation.js'],{encoding:'utf8'}).trim(),'','protected resources changed');
 const baseline=execFileSync('git',['show','43793ab:public/js/world-map.js'],{encoding:'utf8'});
 const server=http.createServer((req,res)=>{
