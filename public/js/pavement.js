@@ -1,9 +1,11 @@
 let surface;
 let extensions = [];
+let plazaOverlay;
+let overlayOrigin;
 
 // The recovered materials are assembled once at native world resolution.
 // This ground-only layer keeps the approved map geometry and depth unchanged.
-export function preparePavement(worldMap) {
+function prepareBasePavement(worldMap) {
   const image = new Image();
   return new Promise((resolve, reject) => {
     image.onload = () => {
@@ -34,4 +36,16 @@ export function drawPavement(ctx) {
   ctx.imageSmoothingEnabled = false;
   for (const {image,x,y} of extensions) ctx.drawImage(image,x,y);
   ctx.drawImage(surface, 0, 0);
+  if (plazaOverlay) ctx.drawImage(plazaOverlay, overlayOrigin.x, overlayOrigin.y);
+}
+
+// Load through the existing ready/error flow; no independent timers or animation.
+export async function preparePavement(worldMap) {
+  const overlay = worldMap.terrain.pavement.overlay;
+  await Promise.all([prepareBasePavement(worldMap), overlay ? new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => { plazaOverlay = image; overlayOrigin = overlay; resolve(); };
+    image.onerror = () => reject(new Error('No se pudo cargar el terreno de la plaza.'));
+    image.src = overlay.src;
+  }) : Promise.resolve()]);
 }

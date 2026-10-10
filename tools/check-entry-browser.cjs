@@ -44,6 +44,8 @@ const server = http.createServer((req,res) => {
       for(let n=1;n<Number(options.id);n++) await page.locator('#outfit-next').click();
       const checkClass = async () => {
         const expected = classes[Number(options.id)-1];
+        // The existing portrait transition replaces src asynchronously.
+        await page.waitForFunction(id => { const img=document.getElementById('outfit-portrait'); return img.src.endsWith('outfit-'+id+'-idle.png') && img.complete && img.naturalWidth>0; }, options.id);
         assert.equal(await page.locator('#outfit-class').textContent(),expected[0]);
         assert.equal(await page.locator('#outfit-ability').textContent(),expected[1]);
         assert.ok((await page.locator('#outfit-description').textContent()).length>60);

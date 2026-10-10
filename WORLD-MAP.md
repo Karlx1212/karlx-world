@@ -1,3 +1,5 @@
+> Estado vigente: la composición localizada aprobada, sus objetos y colisiones se documentan en [CENTRAL-PLAZA.md](CENTRAL-PLAZA.md). Las secciones siguientes conservan el historial de geometría y expansiones anteriores.
+
 # Plaza Central — geometría jugable y Fuente Mágica
 
 `public/js/world-map.js` define la escena `central-plaza`, sin acceso al DOM ni
