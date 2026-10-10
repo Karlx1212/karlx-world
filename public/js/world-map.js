@@ -1,5 +1,5 @@
 import { fountainAssets } from './fountain-assets.js';
-import { gardenObjects, gardenObstacles } from './garden-data.js';
+import { plazaObjects, plazaObstacles } from './central-plaza-data.js';
 // Surface art is independent of playable geometry and fountain depth pieces.
 const fountain = {
   kind: 'fountain', layer: 'layered', x: 700, y: 520,
@@ -26,13 +26,14 @@ export const worldMap = {
   cameraCore: { width: 1400, height: 960 },
   // Reserved only: no shop, access trigger or collision is created.
   reservations: { shop: { x: 1160, y: 690, w: 160, h: 140 } },
-  obstacles: [...fountainObstacles, ...gardenObstacles],
+  obstacles: [...fountainObstacles, ...plazaObstacles],
   // The platform is ground; each raised piece has its own projected depth.
-  objects: [fountain, ...gardenObjects],
+  objects: [fountain, ...plazaObjects],
   terrain: {
     color: '#a5c2aa',
     pavement: {
       surface: { src: '/assets/world/pavement/recovered/ground-C.png' },
+      overlay: { src: '/assets/world/central-plaza/plaza-overlay.png', x: 78, y: 91 },
     },
     grass: { src: '/assets/world/garden/grass-C2.png', tileSize: 512 },
     plaza: { x: 400, y: 325, w: 600, h: 410,
